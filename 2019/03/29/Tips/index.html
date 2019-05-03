@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="tips,开发技巧,踩坑,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="记录开发中碰到的一些问题，以防日后继续踩坑 2019.04po的完整版12345678expr   变量|表达式              //显示变量或者表达式的值。expr -f h --  变量|表达式       //以16进制格式显示变量或表达式的内容expr -f b --  变量|表达式       //以二进制格式显示变量或者表达式的内容。expr -o --  oc对象">
+<meta name="keywords" content="tips,开发技巧,踩坑">
+<meta property="og:type" content="article">
+<meta property="og:title" content="踩坑笔记">
+<meta property="og:url" content="http://yoursite.com/2019/03/29/Tips/index.html">
+<meta property="og:site_name" content="TanZoooou的博客">
+<meta property="og:description" content="记录开发中碰到的一些问题，以防日后继续踩坑 2019.04po的完整版12345678expr   变量|表达式              //显示变量或者表达式的值。expr -f h --  变量|表达式       //以16进制格式显示变量或表达式的内容expr -f b --  变量|表达式       //以二进制格式显示变量或者表达式的内容。expr -o --  oc对象">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2019/03/29/Tips/image-UIControl.png">
+<meta property="og:updated_time" content="2019-05-03T15:28:37.378Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="踩坑笔记">
+<meta name="twitter:description" content="记录开发中碰到的一些问题，以防日后继续踩坑 2019.04po的完整版12345678expr   变量|表达式              //显示变量或者表达式的值。expr -f h --  变量|表达式       //以16进制格式显示变量或表达式的内容expr -f b --  变量|表达式       //以二进制格式显示变量或者表达式的内容。expr -o --  oc对象">
+<meta name="twitter:image" content="http://yoursite.com/2019/03/29/Tips/image-UIControl.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/29/Tips/">
+
+
+
+
+
+  <title>踩坑笔记 | TanZoooou的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">TanZoooou的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/29/Tips/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="TanZou">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TanZoooou的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">踩坑笔记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-29T22:13:14+08:00">
+                2019-03-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/经验总结/" itemprop="url" rel="index">
+                    <span itemprop="name">经验总结</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>记录开发中碰到的一些问题，以防日后继续踩坑</strong></p>
+<h2 id="2019-04"><a href="#2019-04" class="headerlink" title="2019.04"></a>2019.04</h2><h3 id="po的完整版"><a href="#po的完整版" class="headerlink" title="po的完整版"></a>po的完整版</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">expr   变量|表达式              <span class="comment">//显示变量或者表达式的值。</span></span><br><span class="line">expr -f h --  变量|表达式       <span class="comment">//以16进制格式显示变量或表达式的内容</span></span><br><span class="line">expr -f b --  变量|表达式       <span class="comment">//以二进制格式显示变量或者表达式的内容。</span></span><br><span class="line">expr -o --  oc对象             <span class="comment">//等价于po  oc对象</span></span><br><span class="line">expr -P  <span class="number">3</span> -- oc对象           <span class="comment">//上面命令的加强版本，他还会显示出对象内数据成员的结构，具体的P后面的数字就是你要想显示的层次。</span></span><br><span class="line">expr my_struct-&gt;a = my_array[<span class="number">3</span>]    <span class="comment">//给my_struct的a成员赋值。</span></span><br><span class="line">expr (<span class="keyword">char</span>*)_cmd               <span class="comment">//显示某个oc方法的方法名。</span></span><br><span class="line">expr (IMP)[<span class="keyword">self</span> methodForSelector:_cmd]    <span class="comment">//执行某个方法调用.</span></span><br></pre></td></tr></table></figure>
+<p>真机使用的架构是<a href="https://blog.csdn.net/zqixiao_09/article/details/50726544" target="_blank" rel="noopener">arm64指令集</a>，模拟器使用的是x64指令集。可进入汇编调试模式调试。</p>
+<h2 id="2019-3"><a href="#2019-3" class="headerlink" title="2019.3"></a>2019.3</h2><h3 id="微信小程序camera组件录像30s偶发超时问题"><a href="#微信小程序camera组件录像30s偶发超时问题" class="headerlink" title="微信小程序camera组件录像30s偶发超时问题"></a>微信小程序camera组件录像30s偶发超时问题</h3><p>在初始化<code>camera</code>上下文时，若要多次进行录像操作，必须制定<code>id</code>（文档中没有相关说明）。</p>
+<p>不指定<code>id</code>,在进行多次录制时，会初始化多个上下文，<code>stop</code>操作会造成上一次的录制未停止，导致录制超时。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wx.createCameraContext('myCamera')</span><br></pre></td></tr></table></figure>
+<h3 id="保证当前是主线程的正确姿势"><a href="#保证当前是主线程的正确姿势" class="headerlink" title="保证当前是主线程的正确姿势"></a>保证当前是主线程的正确姿势</h3><p>之前在开发中刷新UI时回到主线程一般都是使用：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ([<span class="built_in">NSThread</span> isMainThread]) &#123;</span><br><span class="line">block();</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_main_queue(), block);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是在一些场合需要判断的是<strong>如果在主线程执行非主队列调度的API，而这个API需要检查是否是在主队列上调度，那么将会出现问题。</strong>也就是说需要判断的是<strong>主队列</strong>而不是<strong>主线程</strong>。</p>
+<p>更安全的方法：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">dispatch_main_async_safe(block) &#123;</span><br><span class="line"><span class="keyword">if</span> (strcmp(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL), dispatch_queue_get_label(dispatch_get_main_queue())) == <span class="number">0</span>) &#123;</span><br><span class="line">block();</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_main_queue(), block);\</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>解析：</p>
+<p><code>dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)</code>：每个<code>queue</code>都有一个唯一的<code>label</code>，这是获取当前队列的<code>label</code>。</p>
+<p><code>dispatch_queue_get_label(dispatch_get_main_queue()</code>：获取主队列的<code>label</code>。</p>
+<p><code>strcmp（A, B）== 0</code>: 判断当前队列是否是主队列。</p>
+<p><strong>这个方法将判断是否在主线程执行改为了是否在主队列执行，因为主队列无论是同步还是异步，都不会开辟新的线程，即都是在主线程执行。=&gt; 主队列调度的任务一定在主线程执行，而主线程执行的任务则不一定是在主队列调度</strong></p>
+<h3 id="NSMapTable-的使用"><a href="#NSMapTable-的使用" class="headerlink" title="NSMapTable 的使用"></a>NSMapTable 的使用</h3><p>在翻看<code>SDWebImage</code>源码时，无意中发现原本的<code>imageCache</code>从<code>NSCache</code>为了<code>NSMapTable</code>。正好复习一下<code>NSMapTable</code>。</p>
+<p><code>NSMapTable</code>一般都是和<code>NSDictionary</code>一起讲解的。<code>NSDictionary</code>一般适用于<code>key</code> =&gt; <code>object</code>，且<code>key</code>和<code>object</code>都只能是<code>OC</code>对象，由于<code>NSDictionary</code>是通过<code>key</code>来索引<code>object</code>的，<code>key</code>一旦被修改就无法找到<code>object</code>了，所以<code>NSDictionary</code>始终会复制<code>key</code>到自己的私有空间（<code>key</code>必须支持 <code>NSCopying</code> 协议）。因此一般使用简单高效的对象来作为key（例如<code>NSString</code>、<code>NSNumber</code>），以至于复制的时候不会对 CPU 和内存造成负担。</p>
+<p>如果要做对象到对象的映射，我们可以使用<strong><code>NSMapTable</code></strong>：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">instancetype</span>)initWithKeyPointerFunctions:(<span class="built_in">NSPointerFunctions</span> *)keyFunctions valuePointerFunctions:(<span class="built_in">NSPointerFunctions</span> *)valueFunctions capacity:(<span class="built_in">NSUInteger</span>)initialCapacity;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>NSMapTableStrongMemory</code>: 强引用</p>
+</li>
+<li><p><code>NSMapTableWeakMemory</code>: 弱引用</p>
+</li>
+<li><p><code>NSMapTableObjectPointerPersonality</code> :将对象添加到集合中时是否调用对象上的 <code>isEqualTo：</code> 和 <code>hash</code> 方法</p>
+</li>
+<li><p><code>NSMapTableCopyIn</code>:  复制一份，可以设置<code>key</code>为该属性 =&gt; <code>NSDictionary</code></p>
+</li>
+</ul>
+<p>​</p>
+<h3 id="图片解压缩方案​"><a href="#图片解压缩方案​" class="headerlink" title="图片解压缩方案​"></a>图片解压缩方案​</h3><p>加载图片主要有以下三种方法：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">nullable</span> <span class="built_in">UIImage</span> *)imageNamed:(<span class="built_in">NSString</span> *)name;<span class="comment">//同时会加载图片到内存中</span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">nullable</span> <span class="built_in">UIImage</span> *)imageWithContentsOfFile:(<span class="built_in">NSString</span> *)path;<span class="comment">//不会缓存到内存中，适合较大的不常用的图片</span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">nullable</span> <span class="built_in">UIImage</span> *)imageWithData:(<span class="built_in">NSData</span> *)data;<span class="comment">//不缓存，适合于加载网络图片</span></span><br></pre></td></tr></table></figure>
+<p><strong>iOS加载图片流程：</strong></p>
+<p>当使用<code>imageWithContentsOfFile</code>从地址中获取图片时，图片并没有解压缩，此时的图片是无法显示的，在渲染到屏幕之前，必须先要得到图片的原始像素数据（位图）。</p>
+<p>将生成的image赋值给UIImageView，此时<code>CoreAnimation（CA）</code>的事务<code>（CATrasaction）</code>会捕获到<code>UIImageView</code>图层树的变化，在主线程的下一个<code>runloop</code>到来时，<code>CA</code>会提交这个事务:</p>
+<ol>
+<li>分配内存缓冲区用于管理文件<code>IO</code>和解压缩操作。</li>
+<li>从磁盘中读取图片数据到内存中。</li>
+<li>在<strong>主线程</strong>中将图片数据解码成未压缩的位图形式（<strong>耗时操作</strong>）</li>
+<li>最后将位图渲染到<code>UIImageView</code>的图层上</li>
+</ol>
+<p>在以上操作中将图片解码成位图是一个在主线程中的耗时操作，因此很有必要将它放到子线程中提前解码成位图，再在主线程中渲染图片。<strong>而强制解压缩的原理就是对图片进行重新绘制，得到一张新的解压缩后的位图。</strong></p>
+<p><strong>SDWebImage图片解压缩</strong></p>
+<p>SDWebImage在从磁盘获取图片数据时，会根据图片是否包含Alpha通道以及是否图片存储时是否被缩小（iOS缓存操作60M的图片时，会缩小图片再进行缓存<code>SDImageCacheScaleDownLargeImages</code>）进行解压缩。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">nullable</span> <span class="built_in">UIImage</span> *)sd_decompressedImageWithImage:(<span class="keyword">nullable</span> <span class="built_in">UIImage</span> *)image &#123;</span><br><span class="line">    <span class="keyword">if</span> (![[<span class="keyword">self</span> <span class="keyword">class</span>] shouldDecodeImage:image]) &#123;</span><br><span class="line">        <span class="keyword">return</span> image;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// autorelease the bitmap context and all vars to help system to free memory when there are memory warning.</span></span><br><span class="line">    <span class="comment">// on iOS7, do not forget to call [[SDImageCache sharedImageCache] clearMemory];</span></span><br><span class="line">    <span class="keyword">@autoreleasepool</span>&#123;<span class="comment">//自动释放池，释放变量</span></span><br><span class="line">        </span><br><span class="line">        <span class="built_in">CGImageRef</span> imageRef = image.CGImage;</span><br><span class="line">        <span class="comment">// device color space</span></span><br><span class="line">        <span class="built_in">CGColorSpaceRef</span> colorspaceRef = SDCGColorSpaceGetDeviceRGB();<span class="comment">//色域</span></span><br><span class="line">        <span class="built_in">BOOL</span> hasAlpha = SDCGImageRefContainsAlpha(imageRef);</span><br><span class="line">        <span class="comment">// iOS display alpha info (BRGA8888/BGRX8888)</span></span><br><span class="line">        <span class="built_in">CGBitmapInfo</span> bitmapInfo = kCGBitmapByteOrder32Host;<span class="comment">//kCGBitmapByteOrder32Little iPhone是小端模式，数据以32位位单位</span></span><br><span class="line">        <span class="comment">//位图布局信息 有Alpha通道时，将A通道乘以RGB，无Alpha通道时，跳过</span></span><br><span class="line">        bitmapInfo |= hasAlpha ? kCGImageAlphaPremultipliedFirst : kCGImageAlphaNoneSkipFirst;</span><br><span class="line">        </span><br><span class="line">        size_t width = <span class="built_in">CGImageGetWidth</span>(imageRef);</span><br><span class="line">        size_t height = <span class="built_in">CGImageGetHeight</span>(imageRef);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// kCGImageAlphaNone is not supported in CGBitmapContextCreate.</span></span><br><span class="line">        <span class="comment">// Since the original image here has no alpha info, use kCGImageAlphaNoneSkipLast</span></span><br><span class="line">        <span class="comment">// to create bitmap graphics contexts without alpha info.</span></span><br><span class="line">        <span class="built_in">CGContextRef</span> context = <span class="built_in">CGBitmapContextCreate</span>(<span class="literal">NULL</span>,<span class="comment">//data系统会自动分配和是否内存</span></span><br><span class="line">                                                     width,<span class="comment">//位图宽高，即像素数量</span></span><br><span class="line">                                                     height,</span><br><span class="line">                                                     kBitsPerComponent,<span class="comment">//像素的每个颜色分量使用的 bit 数</span></span><br><span class="line">                                                     <span class="number">0</span>,<span class="comment">//位图的每一行使用的字节数=》大小至少为4 * width，指定0时系统不仅会为我们自动计算，而且还会进行 cache line alignment 的优化。优化过程不了解。。。这么用就好</span></span><br><span class="line">                                                     colorspaceRef,<span class="comment">//色域 使用RGB</span></span><br><span class="line">                                                     bitmapInfo);<span class="comment">//位图布局信息</span></span><br><span class="line">        <span class="keyword">if</span> (context == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> image;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Draw the image into the context and retrieve the new bitmap image without alpha</span></span><br><span class="line">        <span class="built_in">CGContextDrawImage</span>(context, <span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, width, height), imageRef);</span><br><span class="line">        <span class="built_in">CGImageRef</span> imageRefWithoutAlpha = <span class="built_in">CGBitmapContextCreateImage</span>(context);</span><br><span class="line">        <span class="built_in">UIImage</span> *imageWithoutAlpha = [[<span class="built_in">UIImage</span> alloc] initWithCGImage:imageRefWithoutAlpha scale:image.scale orientation:image.imageOrientation];</span><br><span class="line">        <span class="built_in">CGContextRelease</span>(context);</span><br><span class="line">        <span class="built_in">CGImageRelease</span>(imageRefWithoutAlpha);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> imageWithoutAlpha;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2018"><a href="#2018" class="headerlink" title="2018"></a>2018</h2><h3 id="在数据库中递归子节点并建立表关联实现快速检索"><a href="#在数据库中递归子节点并建立表关联实现快速检索" class="headerlink" title="在数据库中递归子节点并建立表关联实现快速检索"></a>在数据库中递归子节点并建立表关联实现快速检索</h3><p>我们在开发过程中遇到大数据检索时，如果直接对多个表数据分别进行检索将很可能会导致很严重的性能问题，导致页面卡顿。</p>
+<p>我们可以使用多张表关联的方式来优化该问题：在云办公组织组件中，由于组织树层次深、结构复杂，要计算每个初始节点包含的总人数，如果直接分别计算该节点的每个子节点的人数和，则需要执行多次的查询，势必会出现严重的性能问题。可以用表连接的方式来优化，SQLite 语句如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">membersCount = [db intForQuery:[<span class="built_in">NSString</span> stringWithFormat:</span><br><span class="line">    <span class="string">@"SELECT count(*) from tbl_persons\</span></span><br><span class="line"><span class="string">    INNER JOIN (\</span></span><br><span class="line"><span class="string">    WITH RECURSIVE\</span></span><br><span class="line"><span class="string">    cte(depId, deptName, superDeptCode) AS(\</span></span><br><span class="line"><span class="string">    SELECT depId,deptName,superDeptCode FROM tbl_deptments WHERE depId=%zd\</span></span><br><span class="line"><span class="string">    UNION ALL\</span></span><br><span class="line"><span class="string">    SELECT a.depId, a.deptName, a.superDeptCode FROM tbl_deptments AS a INNER JOIN\</span></span><br><span class="line"><span class="string">    cte ON a.superDeptCode=cte.depId\</span></span><br><span class="line"><span class="string">    )\</span></span><br><span class="line"><span class="string">    SELECT * FROM cte\</span></span><br><span class="line"><span class="string">    ) AS a ON tbl_persons.deptCode = a.depId\</span></span><br><span class="line"><span class="string">    where lState=%zd and companyId=%zd"</span>,</span><br><span class="line">    deptId, state, [[<span class="built_in">CLOfficeUser</span> shareInstance].companyId integerValue]]];</span><br></pre></td></tr></table></figure>
+<p>其中:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">WITH RECURSIVE\</span><br><span class="line">cte(depId, deptName, superDeptCode) AS(\</span><br><span class="line">SELECT depId,deptName,superDeptCode FROM tbl_deptments WHERE depId=%zd\</span><br><span class="line">UNION ALL\</span><br><span class="line">SELECT a.depId, a.deptName, a.superDeptCode FROM tbl_deptments AS a INNER JOIN\</span><br><span class="line">cte ON a.superDeptCode=cte.depId\</span><br><span class="line">)\</span><br><span class="line">SELECT * FROM cte\</span><br></pre></td></tr></table></figure>
+<p>表示对部门表<code>tbl_deptments</code>进行递归查询<code>superDeptCode</code>节点下的所有子节点<code>depId</code>。</p>
+<p><code>INNER JOIN</code> 表示将关联两张表进行查询。</p>
+<h3 id="使用宏判断输入的路径参数是否合法，并且给出代码提示"><a href="#使用宏判断输入的路径参数是否合法，并且给出代码提示" class="headerlink" title="使用宏判断输入的路径参数是否合法，并且给出代码提示"></a>使用宏判断输入的路径参数是否合法，并且给出代码提示</h3><p>在使用 KVO 时，通常要指定一个观察路径<code>keyPath</code>,如果该路径字符串拼错或是不存在，编译时并不会报错，只有等到运行时才会发现问题。Facebook开源的<code>FBKVOController</code>通过宏定义来解决了这个问题：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#define keypath(self, path)   \</span></span><br><span class="line">(((<span class="keyword">void</span>)(<span class="literal">NO</span> &amp;&amp; ((<span class="keyword">void</span>)<span class="keyword">self</span>.path, <span class="literal">NO</span>)), strchr(<span class="meta"># PATH, '.') + 1))</span></span><br></pre></td></tr></table></figure>
+<p>其中<code>(((void)(NO &amp;&amp; ((void)self.path, NO)), strchr(# PATH, &#39;.&#39;) + 1))</code>是一个逗号表达式，只会计算逗号后面的部分<code>strchr(# PATH, &#39;.&#39;) + 1</code>，由于前面部分没有使用，编译器会报警告，因此加上<code>(void)</code>强制转换类型。</p>
+<p><code>(NO &amp;&amp; ((void)self.path, NO))</code>NO与运算，直接跳过忽略第一个值，去计算表达式后面的值，且这里使用<code>(void)self.path</code>对<code>path</code>进行点运算，只要作为表达式的一部分，Xcode会自动提示。</p>
+<p>如果传入的<code>path</code>不是<code>self</code>的属性，那么<code>self.path</code>就不是一个合法的表达式，所以自然编译就不会通过了。</p>
+<p>使用：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@keypath(<span class="keyword">self</span>.personA);<span class="comment">//返回@"personA"</span></span><br></pre></td></tr></table></figure>
+<p><code>keypath(self, path)</code>返回的是C字符串，前面加@可转为OC对象<code>NSString</code>。</p>
+<h3 id="NS-ENUM-与-NS-OPTIONS"><a href="#NS-ENUM-与-NS-OPTIONS" class="headerlink" title="NS_ENUM 与 NS_OPTIONS"></a>NS_ENUM 与 NS_OPTIONS</h3><p>使用 <code>NS_ENUM</code> 与 <code>NS_OPTIONS</code> 宏来定义枚举类型可以指明底层的数据类型。</p>
+<p>使用:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_OPTIONS</span>(<span class="built_in">NSUInteger</span>, <span class="built_in">UISwipeGestureRecognizerDirection</span>) &#123;</span><br><span class="line">    <span class="built_in">UISwipeGestureRecognizerDirectionNone</span> = <span class="number">0</span>,  <span class="comment">// 值为0</span></span><br><span class="line">    <span class="built_in">UISwipeGestureRecognizerDirectionRight</span> = <span class="number">1</span> &lt;&lt; <span class="number">0</span>,  <span class="comment">// 值为2的0次方 即左移一位</span></span><br><span class="line">    <span class="built_in">UISwipeGestureRecognizerDirectionLeft</span> = <span class="number">1</span> &lt;&lt; <span class="number">1</span>,  <span class="comment">// 值为2的1次方</span></span><br><span class="line">    <span class="built_in">UISwipeGestureRecognizerDirectionUp</span> = <span class="number">1</span> &lt;&lt; <span class="number">2</span>,  <span class="comment">// 值为2的2次方</span></span><br><span class="line">    <span class="built_in">UISwipeGestureRecognizerDirectionDown</span> = <span class="number">1</span> &lt;&lt; <span class="number">3</span>  <span class="comment">// 值为2的3次方</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSInteger</span>, <span class="built_in">NSWritingDirection</span>) &#123;</span><br><span class="line">    <span class="built_in">NSWritingDirectionNatural</span> = <span class="number">0</span>,  <span class="comment">// 值为0    </span></span><br><span class="line">    <span class="built_in">NSWritingDirectionLeftToRight</span>,  <span class="comment">// 值为1</span></span><br><span class="line">    <span class="built_in">NSWritingDirectionRightToLeft</span>  <span class="comment">// 值为2       </span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>区别:</p>
+<ul>
+<li><p><code>NS_ENUM</code> 枚举项的值为 <code>NSInteger</code>，<code>NS_OPTIONS</code> 枚举项的值为 <code>NSUInteger</code></p>
+</li>
+<li><p><code>NS_ENUM</code> 定义通用枚举（默认自增步长为 1），<code>NS_OPTIONS</code> 定义位移枚举(可以同时存在多个)</p>
+</li>
+<li><p><code>NS_OPTIONS</code>的枚举项的值一般使用位运算符定义：<code>1 &lt;&lt; 0，1 &lt;&lt; 1</code>，而 <code>NS_ENUM</code> 的值一般直接使用数值：0 1 2</p>
+</li>
+</ul>
+<p>在使用或运算操作两个枚举值时，C++ 默认为运算结果的数据类型是枚举的底层数据类型<code>(NSUInteger)</code>,且 C++ 不允许它隐式转换为枚举类型本身，所以 C++ 模式下定义了 <code>NS_OPTIONS</code> 宏以保证不会出现类型转换。因此如果OC不按 C++ 模式编译，两者展开方式相同。如果按照 C++ 模式编译, 则存在区别。</p>
+<p>结论：只要枚举值需要按位或（2个及以上枚举值可多个存在）就使用 <code>NS_OPTIONS</code>，否则使用 <code>NS_ENUM</code>。</p>
+<h3 id="UIControl拖拽移出控件问题"><a href="#UIControl拖拽移出控件问题" class="headerlink" title="UIControl拖拽移出控件问题"></a>UIControl拖拽移出控件问题</h3><p>我们要自定义控件的互动效果时需要使用 <code>UIControl</code>，但是在使用时发现，离开控件时并不会触发 <code>UIControlEventTouchDragExit</code> 和 <code>UIControlEventTouchDragOutside</code>，实践后发现，离开控件边缘100px时，才会触发该事件。</p>
+<p><img src="/2019/03/29/Tips/image-UIControl.png" alt="image-20190402150100261"></p>
+<p>我们可以使用以下代码来取消这个效果。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">BOOL</span>)continueTrackingWithTouch:(<span class="built_in">UITouch</span> *)touch withEvent:(<span class="built_in">UIEvent</span> *)event &#123;</span><br><span class="line">    <span class="comment">// 设置新的边界</span></span><br><span class="line">    <span class="built_in">CGFloat</span> boundsExtension = <span class="number">0.0</span>f;</span><br><span class="line">    <span class="built_in">CGRect</span> outerBounds = <span class="built_in">CGRectInset</span>(<span class="keyword">self</span>.bounds, <span class="number">-1</span> * boundsExtension, <span class="number">-1</span> * boundsExtension);</span><br><span class="line">    <span class="comment">// 判断触摸位置</span></span><br><span class="line">    <span class="built_in">BOOL</span> touchOutside = !<span class="built_in">CGRectContainsPoint</span>(outerBounds, [touch locationInView:<span class="keyword">self</span>]);</span><br><span class="line">    <span class="keyword">if</span>(touchOutside)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 判断是UIControlEventTouchDragExit/UIControlEventTouchDragOutside</span></span><br><span class="line">        <span class="built_in">BOOL</span> previousTouchInside = <span class="built_in">CGRectContainsPoint</span>(outerBounds, [touch previousLocationInView:<span class="keyword">self</span>]);</span><br><span class="line">        <span class="keyword">if</span>(previousTouchInside)</span><br><span class="line">        &#123;</span><br><span class="line">            [<span class="keyword">self</span> sendActionsForControlEvents:<span class="built_in">UIControlEventTouchDragExit</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            [<span class="keyword">self</span> sendActionsForControlEvents:<span class="built_in">UIControlEventTouchDragOutside</span>];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        [<span class="keyword">self</span> sendActionsForControlEvents:<span class="built_in">UIControlEventTouchDown</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果不是想要修改的control event，返回原操作</span></span><br><span class="line">    <span class="keyword">return</span> [<span class="keyword">super</span> continueTrackingWithTouch:touch withEvent:event];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="判断两张UIImage全等"><a href="#判断两张UIImage全等" class="headerlink" title="判断两张UIImage全等"></a>判断两张UIImage全等</h3><p>判断两张图片全像素相等，网络上提供的方法大多如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">BOOL</span> isImageEqual(<span class="built_in">UIImage</span> *image1, <span class="built_in">UIImage</span> *image2) &#123;</span><br><span class="line">     <span class="keyword">if</span> (image1 &amp;&amp; image2) &#123;</span><br><span class="line">         <span class="built_in">NSData</span> *data1 = <span class="built_in">UIImagePNGRepresentation</span>(image1);</span><br><span class="line">         <span class="built_in">NSData</span> *data2 = <span class="built_in">UIImagePNGRepresentation</span>(image2);</span><br><span class="line">         <span class="built_in">BOOL</span> result = [data1 isEqual:data2];</span><br><span class="line">         <span class="keyword">return</span> result;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>该方法主要实现思路：采用 <code>UIImagePNGRepresentation</code> 将 <code>UIImage</code> 转化 <code>NSData</code> 之后进行比较。因为：<code>UIImage</code> 显示的图片为 BMP 类型图片。它采用位映射存储格式，除了图像深度可选以外，不采用其他任何压缩，因此，BMP 图像所占用的空间很大。而 <code>UIImagePNGRepresentation</code> 会将 BMP 转化为 PNG ,其过程是是无损数据压缩的，但经过压缩转化后可能存在相同图片压缩结果不同的情况。</p>
+<p>所以以上的判断方法存在三个问题：</p>
+<ul>
+<li>没有判断两张图片来源是否相同，从资源文件中读出的同一张图片组成不同的 <code>UIImage</code> 对象，其指针是相同的，<code>UIImage</code> 只是引用，可能产生图片和自身比较的过程。</li>
+<li>把 <code>UIImage</code> 转成 <code>NSData</code> 的过程非常耗时。</li>
+<li>同一张图片的压缩结果可能存在不同。</li>
+</ul>
+<p>由于 <code>UIImage</code> 使用的图片已经是 BMP 类型的图片，所以只要获取到图片每个像素对应的存储数据进行对比，即可不经过压缩、对比结果绝对精确等。<br>具体代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">BOOL</span> isImageEqual(<span class="built_in">UIImage</span> *image1, <span class="built_in">UIImage</span> *image2) &#123;</span><br><span class="line">    <span class="keyword">if</span> (image1 == image2) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">CGSizeEqualToSize</span>(image1.size, image2.size)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (image1 &amp;&amp; image2) &#123;</span><br><span class="line">        <span class="built_in">CGImageRef</span> imageRef1 = [image1 <span class="built_in">CGImage</span>];</span><br><span class="line">        <span class="comment">//获取图片像素映射信息</span></span><br><span class="line">        <span class="built_in">CFDataRef</span> data1 = <span class="built_in">CGDataProviderCopyData</span>(<span class="built_in">CGImageGetDataProvider</span>(imageRef1));</span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> * buffer1 =  <span class="built_in">CFDataGetBytePtr</span>(data1);</span><br><span class="line">        <span class="built_in">CFIndex</span> length1 = <span class="built_in">CFDataGetLength</span>(data1);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">CGImageRef</span> imageRef2 = [image2 <span class="built_in">CGImage</span>];</span><br><span class="line">        <span class="built_in">CFDataRef</span> data2 = <span class="built_in">CGDataProviderCopyData</span>(<span class="built_in">CGImageGetDataProvider</span>(imageRef2));</span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> * buffer2 =  <span class="built_in">CFDataGetBytePtr</span>(data2);</span><br><span class="line">        <span class="built_in">CFIndex</span> length2 = <span class="built_in">CFDataGetLength</span>(data2);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (length1 != length2) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">BOOL</span> result = <span class="literal">YES</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">long</span> i = <span class="number">0</span>; i&lt;length1; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(*(buffer1+i) != *(buffer2+i))&#123;</span><br><span class="line">                result = <span class="literal">NO</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//autoRelease...CG CF object</span></span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>经过测试，最差情况下，性能是原方案的4-10倍。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tips/" rel="tag"># tips</a>
+          
+            <a href="/tags/开发技巧/" rel="tag"># 开发技巧</a>
+          
+            <a href="/tags/踩坑/" rel="tag"># 踩坑</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/21/JSPatch/" rel="next" title="JSPatch学习实践">
+                <i class="fa fa-chevron-left"></i> JSPatch学习实践
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">TanZou</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#2019-04"><span class="nav-number">1.</span> <span class="nav-text">2019.04</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#po的完整版"><span class="nav-number">1.1.</span> <span class="nav-text">po的完整版</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2019-3"><span class="nav-number">2.</span> <span class="nav-text">2019.3</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#微信小程序camera组件录像30s偶发超时问题"><span class="nav-number">2.1.</span> <span class="nav-text">微信小程序camera组件录像30s偶发超时问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#保证当前是主线程的正确姿势"><span class="nav-number">2.2.</span> <span class="nav-text">保证当前是主线程的正确姿势</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSMapTable-的使用"><span class="nav-number">2.3.</span> <span class="nav-text">NSMapTable 的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#图片解压缩方案​"><span class="nav-number">2.4.</span> <span class="nav-text">图片解压缩方案​</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2018"><span class="nav-number">3.</span> <span class="nav-text">2018</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在数据库中递归子节点并建立表关联实现快速检索"><span class="nav-number">3.1.</span> <span class="nav-text">在数据库中递归子节点并建立表关联实现快速检索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用宏判断输入的路径参数是否合法，并且给出代码提示"><span class="nav-number">3.2.</span> <span class="nav-text">使用宏判断输入的路径参数是否合法，并且给出代码提示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NS-ENUM-与-NS-OPTIONS"><span class="nav-number">3.3.</span> <span class="nav-text">NS_ENUM 与 NS_OPTIONS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UIControl拖拽移出控件问题"><span class="nav-number">3.4.</span> <span class="nav-text">UIControl拖拽移出控件问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#判断两张UIImage全等"><span class="nav-number">3.5.</span> <span class="nav-text">判断两张UIImage全等</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">TanZou</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

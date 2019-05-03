@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="load,main函数,method swizzling,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="背景目前部分产品反馈启动时间还是较慢。但目前启动时间耗时统计方案无法统计到 main 方法之前的 load 方法耗时，无法定位耗时长的组件代码。 第三方方案：Hook所有+load方法（包括Category）该方案通过 Hook 所有 Class 中的 load 方法的方式实现了 load 方法的替换。在替换的方法前后加入耗时统计函数，从而实现 load 方法耗时统计。 但是该方案遍历 load">
+<meta name="keywords" content="load,main函数,method swizzling">
+<meta property="og:type" content="article">
+<meta property="og:title" content="load 耗时检测">
+<meta property="og:url" content="http://yoursite.com/2018/06/14/LoadTimeCheck/index.html">
+<meta property="og:site_name" content="TanZoooou的博客">
+<meta property="og:description" content="背景目前部分产品反馈启动时间还是较慢。但目前启动时间耗时统计方案无法统计到 main 方法之前的 load 方法耗时，无法定位耗时长的组件代码。 第三方方案：Hook所有+load方法（包括Category）该方案通过 Hook 所有 Class 中的 load 方法的方式实现了 load 方法的替换。在替换的方法前后加入耗时统计函数，从而实现 load 方法耗时统计。 但是该方案遍历 load">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2018/06/14/LoadTimeCheck/load_progress.png">
+<meta property="og:image" content="http://yoursite.com/2018/06/14/LoadTimeCheck/mach-o_list.png">
+<meta property="og:image" content="http://yoursite.com/2018/06/14/LoadTimeCheck/mach-o_objc_nlclslist.png">
+<meta property="og:image" content="http://yoursite.com/2018/06/14/LoadTimeCheck/mach-o_nlclass.png">
+<meta property="og:image" content="http://yoursite.com/2018/06/14/LoadTimeCheck/mach-o_nlcategory.png">
+<meta property="og:image" content="http://yoursite.com/2018/06/14/LoadTimeCheck/mach-o_category_apfkithelper.png">
+<meta property="og:image" content="http://yoursite.com/2018/06/14/LoadTimeCheck/phone_demo.png">
+<meta property="og:updated_time" content="2019-05-03T15:25:34.522Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="load 耗时检测">
+<meta name="twitter:description" content="背景目前部分产品反馈启动时间还是较慢。但目前启动时间耗时统计方案无法统计到 main 方法之前的 load 方法耗时，无法定位耗时长的组件代码。 第三方方案：Hook所有+load方法（包括Category）该方案通过 Hook 所有 Class 中的 load 方法的方式实现了 load 方法的替换。在替换的方法前后加入耗时统计函数，从而实现 load 方法耗时统计。 但是该方案遍历 load">
+<meta name="twitter:image" content="http://yoursite.com/2018/06/14/LoadTimeCheck/load_progress.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/06/14/LoadTimeCheck/">
+
+
+
+
+
+  <title>load 耗时检测 | TanZoooou的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">TanZoooou的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/14/LoadTimeCheck/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="TanZou">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TanZoooou的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">load 耗时检测</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-14T11:42:50+08:00">
+                2018-06-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/经验总结/" itemprop="url" rel="index">
+                    <span itemprop="name">经验总结</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>目前部分产品反馈启动时间还是较慢。但目前启动时间耗时统计方案无法统计到 main 方法之前的 load 方法耗时，无法定位耗时长的组件代码。</p>
+<h3 id="第三方方案：Hook所有-load方法（包括Category）"><a href="#第三方方案：Hook所有-load方法（包括Category）" class="headerlink" title="第三方方案：Hook所有+load方法（包括Category）"></a>第三方方案：<a href="https://mp.weixin.qq.com/s/kL__CM3CfP_7i8Obg8qzWQ" target="_blank" rel="noopener">Hook所有+load方法（包括Category）</a></h3><p>该方案通过 Hook 所有 Class 中的 load 方法的方式实现了 load 方法的替换。在替换的方法前后加入耗时统计函数，从而实现 load 方法耗时统计。</p>
+<p>但是该方案遍历 load 方法的过程是通过查找所有的镜像，然后通过 <code>const char * _Nonnull * _Nullable objc_copyClassNamesForImage(const char * _Nonnull image,  unsigned int * _Nullable outCount)</code> 方法找到所有的类，再遍历所有类中的所有方法，从而捞出了所有的 +load 方法。</p>
+<h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><p>这个方案中有一个非常值得借鉴的点：将 Hook 方法写在动态库中，若让主工程包只依赖该动态库。使得该动态库一定可以最先被加载。在该动态库中唯一一个 +load 方法中去检测整个 App 中所有的类，确保可以在其他任何类加载前对其进行检测，和方法替换。</p>
+<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><p>以目前一个中等大小的应用工厂组装产品为例，需要耗时大约150ms，以99u这样的平台型 App 而言，耗时至少会增加一倍以上。而这一切都是在工程启动的时候做的，若在每次启动时都开始 load 耗时检测，那这个 Hook 过程的耗时肯定不能接受。哪怕是选择启用，这样的耗时也十分影响体验。所以本篇文章将说明如何在这个方案的基础上进行改进。</p>
+<h3 id="load-耗时检测的思路："><a href="#load-耗时检测的思路：" class="headerlink" title="load 耗时检测的思路："></a>load 耗时检测的思路：</h3><h4 id="思路一"><a href="#思路一" class="headerlink" title="思路一"></a>思路一</h4><p>通过在最早 load 的方法中加入一个获取到所有需要被执行load方法的类及分类，并对其进行 method swizzling 替换。</p>
+<h4 id="思路二"><a href="#思路二" class="headerlink" title="思路二"></a>思路二</h4><p>对执行 load 方法的程序调用栈上的关键函数进行 fishhook ，从而实现获取到 load 方法关键信息，并对关信息（如 IMP、SEL 、Class 等）做处理。</p>
+<h3 id="探究-load-方法调用过程"><a href="#探究-load-方法调用过程" class="headerlink" title="探究 + load 方法调用过程"></a>探究 + load 方法调用过程</h3><h4 id="dyld-和-objc-库静态分析"><a href="#dyld-和-objc-库静态分析" class="headerlink" title="dyld 和 objc 库静态分析"></a>dyld 和 objc 库静态分析</h4><p>从 App 启动到加载到这个动态库第一个 load 方法过程中经历了哪些过程呢？</p>
+<p>我们可以通过打断点的方式查看这个堆栈。</p>
+<p><img src="/2018/06/14/LoadTimeCheck/load_progress.png" alt="load_progress"></p>
+<p>这里可以看到程序入口是：</p>
+<p>_dyld_start ，这是一个汇编的入口，其目的是加载、启动 dyld 库解析 App 的动态库依赖，然后在 objc 库中进行image 的加载。这两个库在 <code>/usr/lib</code> 路径下，我们可以通过 Mach-O 文件看到其中的函数名。由于它是开源的。我们可以在 <a href="https://opensource.apple.com/source/dyld/" target="_blank" rel="noopener">dyld 源码（在线版）</a>  在线阅读它，也可以通过 <a href="https://opensource.apple.com/tarballs/dyld/" target="_blank" rel="noopener">dyld源码（下载版）</a> 下载到本地阅读。</p>
+<p>我们下载 dyld-551.4 、objc4-723 这两个库到本地进行静态分析。</p>
+<p>堆栈中可以看到，在栈底处 <code>12 dyld::_main</code> 中正式地开始加载程序，进行动态库以来解析等。在 <code>3 dyld::notifySingle</code> 中调用 objc 中的 <code>load_images</code> 进行镜像的加载，在加载过程中进行了 load 的初始化。</p>
+<p>知道了 +load 初始化的大致过程后，我们可以深入代码细节进行分析。</p>
+<p>我们从栈顶开始反向看 +load 方法被调用过程。在 objc 库中的 <code>objc-loadmethod.m</code> 文件找到 <code>call_class_loads</code> 方法：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> call_class_loads(<span class="keyword">void</span>)&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="comment">// Detach current loadable list.</span></span><br><span class="line">    <span class="comment">//这是所有符合条件可被执行load的类</span></span><br><span class="line">    <span class="keyword">struct</span> loadable_class *classes = loadable_classes;</span><br><span class="line">    <span class="keyword">int</span> used = loadable_classes_used;</span><br><span class="line">    loadable_classes = <span class="literal">nil</span>;</span><br><span class="line">    loadable_classes_allocated = <span class="number">0</span>;</span><br><span class="line">    loadable_classes_used = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// Call all +loads for the detached list.</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; used; i++) &#123;</span><br><span class="line">        Class cls = classes[i].cls;</span><br><span class="line">        <span class="comment">//此处取到 load 方法的 IMP</span></span><br><span class="line">        load_method_t load_method = (load_method_t)classes[i].method;</span><br><span class="line">        <span class="keyword">if</span> (!cls) <span class="keyword">continue</span>; </span><br><span class="line">        <span class="keyword">if</span> (PrintLoading) &#123;</span><br><span class="line">            _objc_inform(<span class="string">"LOAD: +[%s load]\n"</span>, cls-&gt;nameForLogging());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//此次进行load初始化</span></span><br><span class="line">        (*load_method)(cls, SEL_load);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Destroy the detached list.</span></span><br><span class="line">    <span class="keyword">if</span> (classes) free(classes);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这一步中有两个地方值得注意：</p>
+<ul>
+<li>所有需要被执行 load 方法的类已经被放到 loadable_classes 链表中了</li>
+<li>load 的 IMP 是存在结构体中的。这个关键信息在本次开发中虽然没有用上，但在后续的思考和改进中存在一定的利用空间。</li>
+</ul>
+<p>该方法被 <code>call_load_methods</code> 方法调用，<code>call_class_loads</code> 方法实现如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> call_load_methods(<span class="keyword">void</span>) &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">bool</span> loading = <span class="literal">NO</span>;</span><br><span class="line">    <span class="keyword">bool</span> more_categories;</span><br><span class="line">    loadMethodLock.assertLocked();</span><br><span class="line">    <span class="comment">// Re-entrant calls do nothing; the outermost call will finish the job.</span></span><br><span class="line">    <span class="keyword">if</span> (loading) <span class="keyword">return</span>;</span><br><span class="line">    loading = <span class="literal">YES</span>;</span><br><span class="line">    <span class="keyword">void</span> *pool = objc_autoreleasePoolPush();</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">// 1. Repeatedly call class +loads until there aren't any more</span></span><br><span class="line">        <span class="keyword">while</span> (loadable_classes_used &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">//加载类 load</span></span><br><span class="line">            call_class_loads();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 2. Call category +loads ONCE</span></span><br><span class="line">        <span class="comment">//加载分类 load</span></span><br><span class="line">        more_categories = call_category_loads();</span><br><span class="line">        <span class="comment">// 3. Run more +loads if there are classes OR more untried categories</span></span><br><span class="line">    &#125; <span class="keyword">while</span> (loadable_classes_used &gt; <span class="number">0</span>  ||  more_categories);</span><br><span class="line">    objc_autoreleasePoolPop(pool);</span><br><span class="line">    loading = <span class="literal">NO</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该方法就是先加载所有类的 load，再加载所有分类的 load。该方法被 <code>load_images</code> 调用</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> load_images(<span class="keyword">const</span> <span class="keyword">char</span> *path __unused, <span class="keyword">const</span> <span class="keyword">struct</span> mach_header *mh) &#123;</span><br><span class="line">    <span class="comment">// Return without taking locks if there are no +load methods here.</span></span><br><span class="line">    <span class="keyword">if</span> (!hasLoadMethods((<span class="keyword">const</span> headerType *)mh)) <span class="keyword">return</span>;</span><br><span class="line">    recursive_mutex_locker_t lock(loadMethodLock);</span><br><span class="line">    <span class="comment">// Discover load methods &#123;</span></span><br><span class="line">        rwlock_writer_t lock2(runtimeLock);</span><br><span class="line">        prepare_load_methods((<span class="keyword">const</span> headerType *)mh);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Call +load methods (without runtimeLock - re-entrant)</span></span><br><span class="line">    call_load_methods();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上文说到：进行 load_method 调用的时候，所有需要被调用的 load 的方法已经被加入到链表中了，那么它们是怎么被加入到链表中、何时被加入到链表中呢？</p>
+<p>答案是：在 <code>load_images</code> 中的 <code>prepare_load_methods((const headerType *)mh);</code>进行镜像文件预加载/解析的时候生成了 <code>loadable_classes</code> 链表。</p>
+<p><code>prepare_load_methods</code> 方法实现如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> prepare_load_methods(<span class="keyword">const</span> headerType *mhdr)&#123;</span><br><span class="line">    size_t count, i;</span><br><span class="line">    runtimeLock.assertWriting();</span><br><span class="line">    <span class="comment">//此处获取到所有需要被执行load方法的类</span></span><br><span class="line">    classref_t *classlist = </span><br><span class="line">        _getObjc2NonlazyClassList(mhdr, &amp;count);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; count; i++) &#123;</span><br><span class="line">        <span class="comment">//此处对类进行remap</span></span><br><span class="line">        schedule_class_load(remapClass(classlist[i]));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//此处获取到所有需要被执行load方法的分类</span></span><br><span class="line">    category_t **categorylist = _getObjc2NonlazyCategoryList(mhdr, &amp;count);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; count; i++) &#123;</span><br><span class="line">        category_t *cat = categorylist[i];</span><br><span class="line">        <span class="comment">//此处肤对分类进行remap</span></span><br><span class="line">        Class cls = remapClass(cat-&gt;cls);</span><br><span class="line">        <span class="keyword">if</span> (!cls) <span class="keyword">continue</span>;  <span class="comment">// category for ignored weak-linked class</span></span><br><span class="line">        realizeClass(cls);</span><br><span class="line">        assert(cls-&gt;ISA()-&gt;isRealized());</span><br><span class="line">        add_category_to_loadable_list(cat);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过 <code>_getObjc2NonlazyClassList</code> 和 <code>_getObjc2NonlazyCategoryList</code> 分别获取到需要被执行 load 方法的类和分类的链表。这两个方法内部实现如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">classref</span> * <span class="title">classref_t</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">category_t</span> &#123;</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *name;</span><br><span class="line">    <span class="keyword">classref_t</span> cls;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">method_list_t</span> *<span class="title">instanceMethods</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">method_list_t</span> *<span class="title">classMethods</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">protocol_list_t</span> *<span class="title">protocols</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">property_list_t</span> *<span class="title">instanceProperties</span>;</span></span><br><span class="line">    <span class="comment">// Fields below this point are not always present on disk.</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">property_list_t</span> *_<span class="title">classProperties</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">method_list_t</span> *methodsForMeta(<span class="keyword">bool</span> isMeta) &#123;</span><br><span class="line">        <span class="keyword">if</span> (isMeta) <span class="keyword">return</span> classMethods;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> instanceMethods;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">property_list_t</span> *propertiesForMeta(<span class="keyword">bool</span> isMeta, struct header_info *hi);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> GETSECT(name, type, sectname)                                   \</span></span><br><span class="line">    <span class="function">type *<span class="title">name</span><span class="params">(<span class="keyword">const</span> headerType *mhdr, <span class="keyword">size_t</span> *outCount)</span> </span>&#123;              \</span><br><span class="line">        <span class="keyword">return</span> getDataSection&lt;type&gt;(mhdr, sectname, nil, outCount);     \</span><br><span class="line">    &#125;                                                                   \</span><br><span class="line">    <span class="function">type *<span class="title">name</span><span class="params">(<span class="keyword">const</span> header_info *hi, <span class="keyword">size_t</span> *outCount)</span> </span>&#123;               \</span><br><span class="line">        <span class="keyword">return</span> getDataSection&lt;type&gt;(hi-&gt;mhdr(), sectname, nil, outCount); \</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">GETSECT(_getObjc2NonlazyClassList,    <span class="keyword">classref_t</span>,      <span class="string">"__objc_nlclslist"</span>);</span><br><span class="line">GETSECT(_getObjc2NonlazyCategoryList, <span class="keyword">category_t</span> *,    <span class="string">"__objc_nlcatlist"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function">T* <span class="title">getDataSection</span><span class="params">(<span class="keyword">const</span> headerType *mhdr, <span class="keyword">const</span> <span class="keyword">char</span> *sectname, <span class="keyword">size_t</span> *outBytes, <span class="keyword">size_t</span> *outCount)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> byteCount = <span class="number">0</span>;</span><br><span class="line">    T* data = (T*)getsectiondata(mhdr, <span class="string">"__DATA"</span>, sectname, &amp;byteCount);</span><br><span class="line">    <span class="keyword">if</span> (!data) &#123;</span><br><span class="line">        data = (T*)getsectiondata(mhdr, <span class="string">"__DATA_CONST"</span>, sectname, &amp;byteCount);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!data) &#123;</span><br><span class="line">        data = (T*)getsectiondata(mhdr, <span class="string">"__DATA_DIRTY"</span>, sectname, &amp;byteCount);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (outBytes) *outBytes = byteCount;</span><br><span class="line">    <span class="keyword">if</span> (outCount) *outCount = byteCount / <span class="keyword">sizeof</span>(T);</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此处用的C++ 的模板方法从 Mach-O 文件的 <code>__DATA</code> 章节中的 <code>__objc_nlclslist</code> 和 <code>__objc_nlcatlist</code> 段中分别获取到指向类描述结构体、分类描述结构体地址的指针。然后通过 remap 的方式拿到类对象、分类对象的指针，加入链表。</p>
+<h4 id="逆向-Mach-O-文件进行验证。"><a href="#逆向-Mach-O-文件进行验证。" class="headerlink" title="逆向 Mach-O 文件进行验证。"></a>逆向 Mach-O 文件进行验证。</h4><p>为验证我们的解析结果，我们取一个现有 App 中的 Mach-O 文件进行检验：</p>
+<p>用 MachOView 工具打开 Mach-O 文件，确实在其中看到 <code>__objc_nlclslist</code> 和 <code>__objc_nlcatlist</code> 等段。</p>
+<p><img src="/2018/06/14/LoadTimeCheck/mach-o_list.png" alt="o_list"></p>
+<p>从<code>NonlazyClass</code>的命名上可以推断出：含有 load 方法的类属于<strong>非懒加载类</strong>，</p>
+<p>同理，从从<code>NonlazyCategory</code>的命名上可以推断出：含有 load 方法的类属于<strong>非懒加载分类</strong>。</p>
+<h5 id="非懒加载类存储方式"><a href="#非懒加载类存储方式" class="headerlink" title="非懒加载类存储方式"></a>非懒加载类存储方式</h5><p><code>__objc_nlclslist</code>段部分数据展示如下：</p>
+<p><img src="/2018/06/14/LoadTimeCheck/mach-o_objc_nlclslist.png" alt="o_objc_nlclslist"></p>
+<p>里面的数据如 <code>68 67 fc 00 01 00 00 00</code> ，此处存储的是大端序的数据，将其转化为小端序后即： <code>00 00 00 01 00 fc 67 68</code> 。</p>
+<p>找到 <code>00 00 00 01 00 fc 67 68</code> 地址上的数据，确实是存储类描述结构体（即<code>struct classref</code>）数据的地址。经验证该类确实实现了 load 方法。所以大致验证我们的猜测正确。</p>
+<p><img src="/2018/06/14/LoadTimeCheck/mach-o_nlclass.png" alt="mach-o_nlclass"></p>
+<p>objc 库通过读取 Mach-O 文件中非懒加载类表和非懒加载分类表的方式实现 + load 方法加载的方案确实优于第三方提供的遍历所有类然后筛选出实现了 + load 方法的类列表的方案。</p>
+<h5 id="非懒加载分类存储方式"><a href="#非懒加载分类存储方式" class="headerlink" title="非懒加载分类存储方式"></a>非懒加载分类存储方式</h5><p>同理，我们可以找到 <code>__objc_nlcatlist</code> 段部分数据，如下所示：</p>
+<p><img src="/2018/06/14/LoadTimeCheck/mach-o_nlcategory.png" alt="mach-o_nlcategory"></p>
+<p>里面的数据如 <code>40 44 D9 00 01 00 00 00</code> ，将其转化为小端序后即： <code>00 00 00 01 00 D9 44 40</code> 。</p>
+<p>找到 <code>00 00 00 01 00 D9 44 40</code> 地址上的数据，确实是存储分类描述结构体（即 <code>struct category_t</code> ）数据的地址。</p>
+<p><img src="/2018/06/14/LoadTimeCheck/mach-o_category_apfkithelper.png" alt="mach-o_category_apfkithelper"></p>
+<h3 id="方案实现"><a href="#方案实现" class="headerlink" title="方案实现"></a>方案实现</h3><h4 id="基于思路一实现："><a href="#基于思路一实现：" class="headerlink" title="基于思路一实现："></a>基于思路一实现：</h4><p>弄懂 <code>load</code> 函数遍历、调用过程，但是可以看到的是以上涉及的方法都是 objc 的内部方法，外部无法进行直接调用。所以就得精简代码后，进行整合、使用。</p>
+<p>首先：从动态库加载的时候，遍历需要加载的镜像列表，找到我们需要解析的镜像：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> 获取主工程 Mach-O 文件入口指针</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> @return Mach-O 文件入口指针</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">struct</span> mach_header *get_target_image_header() &#123;</span><br><span class="line">    <span class="keyword">if</span> (target_image_header == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; _dyld_image_count(); i++) &#123;</span><br><span class="line">            <span class="keyword">const</span> <span class="keyword">char</span> *image_name = _dyld_get_image_name(i);</span><br><span class="line">             <span class="keyword">const</span> <span class="keyword">char</span> *target_image_name = ((<span class="built_in">NSString</span> *)[[[<span class="built_in">NSBundle</span> mainBundle] infoDictionary] objectForKey:<span class="string">@"CFBundleName"</span>]).UTF8String;</span><br><span class="line">            <span class="keyword">if</span> (strstr(image_name, target_image_name) != <span class="literal">NULL</span>) &#123;</span><br><span class="line">                target_image_header = _dyld_get_image_header(i);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> target_image_header;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后从镜像文件中捞出我们想要的非懒加载类和分类链表：其中 <code>_getObjc2NonlazyCategoryList</code> 和 <code>_getObjc2NonlazyClassList</code> 可以基本照搬 objc 库中实现。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">category_t **get_non_lazy_categary_list(size_t *count) &#123;</span><br><span class="line">    category_t **nlcatlist = <span class="literal">NULL</span>;</span><br><span class="line">    nlcatlist = _getObjc2NonlazyCategoryList((headerType *)get_target_image_header(), count);</span><br><span class="line">    <span class="keyword">return</span> nlcatlist;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">classref_t *get_non_lazy_class_list(size_t *count) &#123;</span><br><span class="line">    classref_t *nlclslist = <span class="literal">NULL</span>;</span><br><span class="line">    nlclslist = _getObjc2NonlazyClassList((headerType *)get_target_image_header(), count);</span><br><span class="line">    <span class="keyword">return</span> nlclslist;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以整个遍历非懒加载类及分类并通过 method swizzling 替换的过程如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">+ (<span class="keyword">void</span>)load &#123;</span><br><span class="line">    <span class="built_in">NSString</span> *path = <span class="built_in">NSSearchPathForDirectoriesInDomains</span>(<span class="built_in">NSDocumentDirectory</span>, <span class="built_in">NSUserDomainMask</span>, <span class="literal">YES</span>).firstObject;</span><br><span class="line">    <span class="built_in">NSFileManager</span> *fileManager = [<span class="built_in">NSFileManager</span> defaultManager];</span><br><span class="line">    <span class="built_in">NSString</span> *apfDocPath = [<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"这段路径不重要，隐藏"</span>, path];</span><br><span class="line">    <span class="keyword">if</span>(![fileManager fileExistsAtPath:apfDocPath])&#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    size_t count = <span class="number">0</span>;</span><br><span class="line">    classref_t *nlclslist = get_non_lazy_class_list(&amp;count);</span><br><span class="line">    <span class="comment">//最后一位指向的结构体中isa变量指向0x00000000的指针，故排除</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count - <span class="number">1</span>; i++) &#123;</span><br><span class="line">        Class cls = (Class)<span class="built_in">CFBridgingRelease</span>(nlclslist[i]);</span><br><span class="line">        cls = object_getClass(cls);</span><br><span class="line">        swizzeLoadMethodInClass(cls, <span class="literal">NO</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    nlcategarylist = get_non_lazy_categary_list(&amp;categaryCount);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; categaryCount; i++) &#123;</span><br><span class="line">        Class cls = (Class)<span class="built_in">CFBridgingRelease</span>(nlcategarylist[i]-&gt;cls);</span><br><span class="line">        cls = object_getClass(cls);</span><br><span class="line">        swizzeLoadMethodInClass(cls, <span class="literal">YES</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="其他要点"><a href="#其他要点" class="headerlink" title="其他要点"></a>其他要点</h4><p>值得注意的是：</p>
+<h5 id="classref-t-类型"><a href="#classref-t-类型" class="headerlink" title="classref_t 类型"></a><code>classref_t</code> 类型</h5><p><code>get_non_lazy_class_list</code> 返回类型是 <code>classref_t</code> 。</p>
+<p>由 <code>typedef struct classref * classref_t;</code> 得知：这个类型是 <code>struct classref *</code> 。那么 <code>struct classref</code> 是什么类型呢？在 Mach-O文件解析中，我们看到其类型是 <code>struct objc_class</code> 。所以： <code>struct classref</code> 的类型就是 <code>struct objc_class</code> 。</p>
+<h5 id="category-t-类型"><a href="#category-t-类型" class="headerlink" title="category_t * 类型"></a><code>category_t *</code> 类型</h5><p>可以看到 <code>struct category_t</code> 的类型定义如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> category_t &#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *name;</span><br><span class="line">    classref_t cls;</span><br><span class="line">    <span class="keyword">struct</span> method_list_t *instanceMethods;</span><br><span class="line">    <span class="keyword">struct</span> method_list_t *classMethods;</span><br><span class="line">    <span class="keyword">struct</span> protocol_list_t *protocols;</span><br><span class="line">    <span class="keyword">struct</span> property_list_t *instanceProperties;</span><br><span class="line">    <span class="comment">// Fields below this point are not always present on disk.</span></span><br><span class="line">    <span class="keyword">struct</span> property_list_t *_classProperties;</span><br><span class="line">    method_list_t *methodsForMeta(<span class="keyword">bool</span> isMeta) &#123;</span><br><span class="line">        <span class="keyword">if</span> (isMeta) <span class="keyword">return</span> classMethods;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> instanceMethods;</span><br><span class="line">    &#125;</span><br><span class="line">    property_list_t *propertiesForMeta(<span class="keyword">bool</span> isMeta, <span class="keyword">struct</span> header_info *hi);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这里，引入了  <code>struct method_list_t *</code> ,  <code>struct protocol_list_t *</code> 等，我们此次功能开发中不用的类型。所以在进行 <code>struct category_t</code> 类型引入的时候，做了个精简，能够通过编译即可。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> category_t &#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *name;</span><br><span class="line">    classref_t cls;</span><br><span class="line">    <span class="keyword">void</span> *instanceMethods;</span><br><span class="line">    <span class="keyword">void</span> *classMethods;</span><br><span class="line">    <span class="keyword">void</span> *protocols;</span><br><span class="line">    <span class="keyword">void</span> *instanceProperties;</span><br><span class="line">    <span class="keyword">void</span> *_classProperties;</span><br><span class="line">    <span class="keyword">void</span> *methodsForMeta(<span class="keyword">bool</span> isMeta) &#123;</span><br><span class="line">        <span class="keyword">if</span> (isMeta) <span class="keyword">return</span> classMethods;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> instanceMethods;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">void</span> *propertiesForMeta(<span class="keyword">bool</span> isMeta, <span class="keyword">struct</span> header_info *hi);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h4><p>原本采用第三方的方案，做完一个中等大小 App 的 load 方法 hook 大概需要150 ms ，采用改进后的方案，可以控制在 10ms 以内。虽然这样的效果还达不到让人无感知的程度，所以在生产环境下，目前只是在开发者工具中进行选择启用。</p>
+<p>这是最终效果图：</p>
+<p><img src="/2018/06/14/LoadTimeCheck/phone_demo.png" alt="phone_demo"></p>
+<h4 id="关于思路二的思考"><a href="#关于思路二的思考" class="headerlink" title="关于思路二的思考"></a>关于思路二的思考</h4><p>因为思路一的实现方案，虽然是比第三方的实现方案快了十倍以上，但是我觉得还没有到我很满意的程度。所以我这里也做了一些关于思路二可行性的思考，做一个简单的记录。</p>
+<p>上文提到：在 objc 库中的 <code>objc-loadmethod.m</code> 文件找到 <code>call_class_loads</code> 方法，<code>call_class_loads</code>方法中有 <code>load_method_t load_method = (load_method_t)classes[i].method;</code> 这个 load_method ，就是 +load 方法的 IMP，如果可能拿到这个 IMP，并指向一个 HOOK 后的 IMP，在hook方法之中，调用源 IMP ，其实也是一个非常不错的方案。</p>
+<p>那么有办法更加高效地拿到这个 IMP 吗？</p>
+<p>我觉得可能有。</p>
+<p>这个 IMP 在何时何处被赋值呢？</p>
+<p>在执行 <code>prepare_load_methods</code> 时被赋值，在 <code>objc-loadmethod.m</code> 被调用。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> add_class_to_loadable_list(Class cls)&#123;</span><br><span class="line">    IMP method;</span><br><span class="line">    loadMethodLock.assertLocked();</span><br><span class="line">    method = cls-&gt;getLoadMethod();</span><br><span class="line">    <span class="keyword">if</span> (!method) <span class="keyword">return</span>;  <span class="comment">// Don't bother if cls has no +load method</span></span><br><span class="line">    <span class="keyword">if</span> (PrintLoading) &#123;</span><br><span class="line">        _objc_inform(<span class="string">"LOAD: class '%s' scheduled for +load"</span>, cls-&gt;nameForLogging());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (loadable_classes_used == loadable_classes_allocated) &#123;</span><br><span class="line">        loadable_classes_allocated = loadable_classes_allocated*<span class="number">2</span> + <span class="number">16</span>;</span><br><span class="line">        loadable_classes = (<span class="keyword">struct</span> loadable_class *)</span><br><span class="line">            realloc(loadable_classes, loadable_classes_allocated * <span class="keyword">sizeof</span>(<span class="keyword">struct</span> loadable_class));</span><br><span class="line">    &#125;</span><br><span class="line">    loadable_classes[loadable_classes_used].cls = cls;</span><br><span class="line">    loadable_classes[loadable_classes_used].method = method;</span><br><span class="line">    loadable_classes_used++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个 <code>add_class_to_loadable_list</code> 方法比较长，想要完整地通过 fishhook （考虑不同系统和版本）进行替换，其实难度比较高。但是其中 <code>method = cls-&gt;getLoadMethod();</code> 这个过程其实是有一定机会的， <code>cls-&gt;getLoadMethod</code> 方法如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">IMP objc_class::getLoadMethod()&#123;</span><br><span class="line">    runtimeLock.assertLocked();</span><br><span class="line">    <span class="keyword">const</span> method_list_t *mlist;</span><br><span class="line">    assert(isRealized());</span><br><span class="line">    assert(ISA()-&gt;isRealized());</span><br><span class="line">    assert(!isMetaClass());</span><br><span class="line">    assert(ISA()-&gt;isMetaClass());</span><br><span class="line">    mlist = ISA()-&gt;data()-&gt;ro-&gt;baseMethods();</span><br><span class="line">    <span class="keyword">if</span> (mlist) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">const</span> auto&amp; meth : *mlist) &#123;</span><br><span class="line">            <span class="keyword">const</span> <span class="keyword">char</span> *name = sel_cname(meth.name);</span><br><span class="line">            <span class="keyword">if</span> (<span class="number">0</span> == strcmp(name, <span class="string">"load"</span>)) &#123;</span><br><span class="line">                <span class="keyword">return</span> meth.imp;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个方法是有一定机会通过 fishhook 替换。难道包括且不只于以下几个方面：</p>
+<ul>
+<li>这是 C++ 的类方法，如果通过 fishhook ，我们需要知道其经过函数签名之后的方法名（这个可以通过包逆向做到），但是如何保证这个修饰后的名称不变且稳定是一个困难点。</li>
+<li>通过 fishhook 的方案可行性、性能待论证。 </li>
+</ul>
+<h3 id="关于-iOS-load-机制的思考"><a href="#关于-iOS-load-机制的思考" class="headerlink" title="关于 iOS load 机制的思考"></a>关于 iOS load 机制的思考</h3><h4 id="为什么会有-load-机制"><a href="#为什么会有-load-机制" class="headerlink" title="为什么会有 load 机制"></a>为什么会有 load 机制</h4><p>从 objc 库静态解析结果和 Mach-O 文件分析结果来看。实现了 load 方法的类都是存在 <code>__objc_nlclslist</code>、<code>__objc_nlcatlist</code> 中。为什么要存在这里呢？其实这两个段只是非懒加载类的索引。在 App 启动前，加载的过程中需要执行 load 方法的类可以通过索引遍历出来，然后执行 load 方法，这是 iOS 刻意提供的一种机制，并非一个自然的加载过程中一个顺便的行为。</p>
+<p>那么其他懒加载的类全数会在App启动的时候被加载吗？我虽然还没有对代码做一个更加深入的分析，但是有理由相信是：不会的。</p>
+<p>为什么呢？因为从软件开发至今。内存从来都是昂贵且稀有的。App 绝大部分情况下会少占用内存、有效地利用内存。而且程序运行的时候是有局部性原理的。所以只有程序必须要用到、最常用到的部分才需要有效地驻留在内存内。</p>
+<p>在软件开发的早期阶段，装载软件镜像主要通过覆盖载入，程序员需要手动管理代码段之间依赖关系。而现在采用的的是页映射的方式。所以那些懒加载的类应该是不会被加载进内存，只有发生缺页、断页的情况，才会加载对应的类、对应的代码段。</p>
+<p>因为大部分的类都是懒加载的，而有些事情必须在 App 启动的时候做、在 main 方法之前做，所以才提供了 load 的机制。如果没有这种机制，那么所有的操作只能在 main 方法之后做。对于有些操作来说就太迟了。</p>
+<h4 id="load-应该用来做什么事情"><a href="#load-应该用来做什么事情" class="headerlink" title="load 应该用来做什么事情"></a>load 应该用来做什么事情</h4><p>我曾见过有项目在 load 中初始化了用户信息，让其他业务模块能够尽早使用到用户信息，而用户信息中包含了头像 image ，头像从 <code>SDWebImage</code> 中获取。这么做 直接导致 <code>SDWebImage</code> 库初始化，在 SDWebImage 初始化的过程中还 create 了两条 queue 来处理数据。这么做直接导致了大量类的初始化树和初始化周期被改变。</p>
+<p>还见过有项目在 load 中初始化了三个 <code>NSDateFormtter</code> ，要知道 <code>NSDateFormtter</code> 的初始化是非常耗时的， 而且这个 NSDateFormtter 并没有立刻用到（这是存心来找茬的吧）。 </p>
+<p>以上两个都是反例。</p>
+<p>那么load 应该用来做什么事情呢？</p>
+<p>我觉得 method_swizzling 可以放在 load 中做，还有一些简单的数据统计、钩子相关的东西可以放在 load 中做，以求获取到更多的信息。</p>
+<p>但是任何和业务相关的初始化都不应该放在load 中做。load 就是一个潘多拉魔盒， A 业务放在 load 中初始化了，那么 A 依赖的业务 也务必要放在 load 中初始化，这里无论是显式依赖导致的被动初始化，还是隐式依赖所导致的主动初始化。一旦打开了，就刹不住车了。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/load/" rel="tag"># load</a>
+          
+            <a href="/tags/main函数/" rel="tag"># main函数</a>
+          
+            <a href="/tags/method-swizzling/" rel="tag"># method swizzling</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/22/iOS-HHRouter/" rel="next" title="iOS开发 — HHRouter路由数据传递开发分享">
+                <i class="fa fa-chevron-left"></i> iOS开发 — HHRouter路由数据传递开发分享
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/17/Splinter/" rel="prev" title="python使用splinter实现SDP组件自动化发布">
+                python使用splinter实现SDP组件自动化发布 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">TanZou</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三方方案：Hook所有-load方法（包括Category）"><span class="nav-number">2.</span> <span class="nav-text">第三方方案：Hook所有+load方法（包括Category）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优点"><span class="nav-number">2.1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缺点"><span class="nav-number">2.2.</span> <span class="nav-text">缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#load-耗时检测的思路："><span class="nav-number">3.</span> <span class="nav-text">load 耗时检测的思路：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#思路一"><span class="nav-number">3.1.</span> <span class="nav-text">思路一</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#思路二"><span class="nav-number">3.2.</span> <span class="nav-text">思路二</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#探究-load-方法调用过程"><span class="nav-number">4.</span> <span class="nav-text">探究 + load 方法调用过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#dyld-和-objc-库静态分析"><span class="nav-number">4.1.</span> <span class="nav-text">dyld 和 objc 库静态分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#逆向-Mach-O-文件进行验证。"><span class="nav-number">4.2.</span> <span class="nav-text">逆向 Mach-O 文件进行验证。</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#非懒加载类存储方式"><span class="nav-number">4.2.1.</span> <span class="nav-text">非懒加载类存储方式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#非懒加载分类存储方式"><span class="nav-number">4.2.2.</span> <span class="nav-text">非懒加载分类存储方式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方案实现"><span class="nav-number">5.</span> <span class="nav-text">方案实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基于思路一实现："><span class="nav-number">5.1.</span> <span class="nav-text">基于思路一实现：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他要点"><span class="nav-number">5.2.</span> <span class="nav-text">其他要点</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#classref-t-类型"><span class="nav-number">5.2.1.</span> <span class="nav-text">classref_t 类型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#category-t-类型"><span class="nav-number">5.2.2.</span> <span class="nav-text">category_t * 类型</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结果"><span class="nav-number">5.3.</span> <span class="nav-text">结果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于思路二的思考"><span class="nav-number">5.4.</span> <span class="nav-text">关于思路二的思考</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关于-iOS-load-机制的思考"><span class="nav-number">6.</span> <span class="nav-text">关于 iOS load 机制的思考</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么会有-load-机制"><span class="nav-number">6.1.</span> <span class="nav-text">为什么会有 load 机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#load-应该用来做什么事情"><span class="nav-number">6.2.</span> <span class="nav-text">load 应该用来做什么事情</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">TanZou</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
