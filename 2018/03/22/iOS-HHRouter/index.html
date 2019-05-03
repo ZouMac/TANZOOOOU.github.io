@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>iOS开发 — HHRouter路由数据传递开发分享 | TanZoooou的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言在日常开发中，随着业务越来越复杂，代码中的耦合度将会大大增强，各模块间的相互调用将导致相互间的强依赖，我们可以通过使用HHRouter路由设计思路来减少代码的耦合度。">
+<meta name="keywords" content="HHRouter,控制器间传值">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS开发 — HHRouter路由数据传递开发分享">
+<meta property="og:url" content="http://yoursite.com/2018/03/22/iOS-HHRouter/index.html">
+<meta property="og:site_name" content="TanZoooou的博客">
+<meta property="og:description" content="前言在日常开发中，随着业务越来越复杂，代码中的耦合度将会大大增强，各模块间的相互调用将导致相互间的强依赖，我们可以通过使用HHRouter路由设计思路来减少代码的耦合度。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-02T14:55:33.177Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS开发 — HHRouter路由数据传递开发分享">
+<meta name="twitter:description" content="前言在日常开发中，随着业务越来越复杂，代码中的耦合度将会大大增强，各模块间的相互调用将导致相互间的强依赖，我们可以通过使用HHRouter路由设计思路来减少代码的耦合度。">
+  
+    <link rel="alternate" href="/atom.xml" title="TanZoooou的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">TanZoooou的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-iOS-HHRouter" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/22/iOS-HHRouter/" class="article-date">
+  <time datetime="2018-03-22T03:42:50.000Z" itemprop="datePublished">2018-03-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/经验总结/">经验总结</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      iOS开发 — HHRouter路由数据传递开发分享
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在日常开发中，随着业务越来越复杂，代码中的耦合度将会大大增强，各模块间的相互调用将导致相互间的强依赖，我们可以通过使用<code>HHRouter</code>路由设计思路来减少代码的耦合度。</p>
+<a id="more"></a>
+<h1 id="一、传统控制器间的属性传递"><a href="#一、传统控制器间的属性传递" class="headerlink" title="一、传统控制器间的属性传递"></a>一、传统控制器间的属性传递</h1><p>在日常开发中经常碰到一些属性正向传递的问题，比如说<code>controllerA</code>页面 push 到<code>controllerB</code>页面，我们一般可以通过给控制器属性赋值以及初始化时将属性注入到控制器的方式进行数据的正向传递：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//赋值</span></span><br><span class="line"><span class="built_in">UIViewController</span> *controllerB = [[<span class="built_in">UIViewController</span> alloc] init];</span><br><span class="line">controllerB.name = <span class="string">@"xiaoming"</span>;</span><br><span class="line">controllerB.userId = <span class="string">@"123456"</span>;</span><br><span class="line">[<span class="keyword">self</span>.navigationController pushViewController:controllerB animated:<span class="literal">YES</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">//初始化属性注入</span></span><br><span class="line"><span class="built_in">UIViewController</span> *controllerB = [[<span class="built_in">UIViewController</span> alloc] initWithName:<span class="string">@"xiaoming"</span> userId:<span class="string">@"123456"</span>];</span><br><span class="line">[<span class="keyword">self</span>.navigationController pushViewController:controllerB animated:<span class="literal">YES</span>];</span><br></pre></td></tr></table></figure>
+<p>若需要赋值的属性过多，这么操作将会变得很繁琐，代码也会过于冗余。同时注入的方式将使得两者间产生强依赖，<code>controllerA</code>若要跳转至<code>controllerB</code>，就必须要依赖<code>controllerB</code>，当随着业务的越来越复杂，将会产生错综复杂的依赖链，增加了代码耦合性。</p>
+<h1 id="二、HHRouter实现机制与使用"><a href="#二、HHRouter实现机制与使用" class="headerlink" title="二、HHRouter实现机制与使用"></a>二、<code>HHRouter</code>实现机制与使用</h1><h2 id="2-1、控制器间的数据传递"><a href="#2-1、控制器间的数据传递" class="headerlink" title="2.1、控制器间的数据传递"></a>2.1、控制器间的数据传递</h2><p><code>HHRouter</code>是布丁动画开源的一个 router， URL Router 可以将控制器映射成唯一的 URL，其借鉴了 web 的开发思想，引入一个中介性质的 router，通过 router 完成 VC 间的数据传递。</p>
+<p><code>HHRouter</code>为<code>ViewController</code>提供了两种方法：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//将ViewController映射成对应的router</span></span><br><span class="line">- (<span class="keyword">void</span>)map:(<span class="built_in">NSString</span> *)route toControllerClass:(Class)controllerClass;</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用router匹配到对应的ViewController</span></span><br><span class="line">- (<span class="built_in">UIViewController</span> *)matchController:(<span class="built_in">NSString</span> *)route;</span><br></pre></td></tr></table></figure>
+<p>使用<code>HHRouter</code>将 userId 传递给<code>TZLoginViewController</code>：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[[HHRouter shared] map:<span class="string">@"/login/:userId/"</span> toControllerClass:[TZLoginViewController <span class="keyword">class</span>]];</span><br><span class="line"><span class="built_in">UIViewController</span> *loginVC = [[HHRouter shared] matchController:<span class="string">@"/login/10009999/?a=6&amp;b=7"</span>];</span><br><span class="line">[<span class="keyword">self</span>.navigationController pushViewController:loginVC animated:<span class="literal">YES</span>];</span><br></pre></td></tr></table></figure>
+<p>代码中的<code>@&quot;/login/10009999/&quot;</code>作为路由的链接将<code>userId</code>、<code>a</code>、<code>b</code>的值传递给<code>TZLoginViewController</code>。<br>为了实现该机制，<code>HHRouter</code>会通过 <code>subRoutesToRoute</code> 函数将路由匹配成对应规则的字典：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)map:(<span class="built_in">NSString</span> *)route toControllerClass:(Class)controllerClass &#123;</span><br><span class="line">    <span class="built_in">NSMutableDictionary</span> *subRoutes = [<span class="keyword">self</span> subRoutesToRoute:route];</span><br><span class="line">    subRoutes[<span class="string">@"_"</span>] = controllerClass;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="built_in">NSMutableDictionary</span> *)subRoutesToRoute:(<span class="built_in">NSString</span> *)route &#123;</span><br><span class="line">    <span class="built_in">NSArray</span> *pathComponents = [<span class="keyword">self</span> pathComponentsFromRoute:route];</span><br><span class="line">    <span class="built_in">NSInteger</span> index = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">NSMutableDictionary</span> *subRoutes = <span class="keyword">self</span>.routes;</span><br><span class="line">   <span class="keyword">while</span> (index &lt; pathComponents.count) &#123;</span><br><span class="line">        <span class="built_in">NSString</span> *pathComponent = pathComponents[index];</span><br><span class="line">        <span class="keyword">if</span> (![subRoutes objectForKey:pathComponent]) &#123;</span><br><span class="line">            subRoutes[pathComponent] = [[<span class="built_in">NSMutableDictionary</span> alloc] init];</span><br><span class="line">        &#125;</span><br><span class="line">        subRoutes = subRoutes[pathComponent];</span><br><span class="line">        index++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> subRoutes;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[[HHRouter shared] map:<span class="string">@"/login/:userId/"</span> toControllerClass:[TZLoginViewController <span class="keyword">class</span>]];</span><br><span class="line">[[HHRouter shared] map:<span class="string">@"/register/:registerId/"</span> toControllerClass:[TZRegisterViewController <span class="keyword">class</span>]];</span><br><span class="line">[[HHRouter shared] map:<span class="string">@"/login/:userId/logout/?clearUserInfo = YES"</span> toControllerClass:[TZLogoutViewController <span class="keyword">class</span>]];</span><br></pre></td></tr></table></figure>
+<p>将这三条路由匹配成对应的路由规则字典：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">@&#123;</span><br><span class="line">      <span class="string">@"register"</span> : @&#123;</span><br><span class="line">              <span class="string">@":registerId"</span> : @&#123;</span><br><span class="line">                      <span class="string">@"_"</span> : <span class="string">@"TZRegisterViewController"</span></span><br><span class="line">                      &#125;</span><br><span class="line">              &#125;,</span><br><span class="line">      <span class="string">@"login"</span> : @&#123;</span><br><span class="line">              <span class="string">@":userId"</span> : @&#123;</span><br><span class="line">                      <span class="string">@"_"</span> : <span class="string">@"TZLoginViewCOntroller"</span>,</span><br><span class="line">                      <span class="string">@"logout"</span> : @&#123;</span><br><span class="line">                              <span class="string">@"_"</span> : <span class="string">@"TZLogoutViewController"</span></span><br><span class="line">                              &#125;</span><br><span class="line">                      &#125;</span><br><span class="line">              &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>匹配完成后，当有一条路由过来时，首先<code>HHRouter</code>将匹配对应的 scheme（login），当 scheme 存在时，生成参数字典 params，并传递给<code>TZLoginViewController</code>实例：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//通过router获取到对应的controller</span></span><br><span class="line"><span class="built_in">UIViewController</span> *loginVC = [[HHRouter shared] matchController:<span class="string">@"/login/920413/?autoLogin=YES&amp;rememberPassword=YES"</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">//生成参数字典</span></span><br><span class="line">@&#123;</span><br><span class="line">      <span class="string">@"controller_class"</span> : <span class="string">@"TZLoginViewController"</span>,</span><br><span class="line">      <span class="string">@"router"</span>           : <span class="string">@"/login/920413/"</span>,</span><br><span class="line">      <span class="string">@"userId"</span>           : <span class="string">@"920413"</span>,</span><br><span class="line">      <span class="string">@"autoLogin"</span>        : @(<span class="literal">YES</span>),</span><br><span class="line">      <span class="string">@"rememberPassword"</span> : @(<span class="literal">YES</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取路由匹配的ViewController</span></span><br><span class="line"> - (<span class="built_in">UIViewController</span> *)matchController:(<span class="built_in">NSString</span> *)route &#123;</span><br><span class="line">    <span class="built_in">NSDictionary</span> *params = [<span class="keyword">self</span> paramsInRoute:route];</span><br><span class="line">    Class controllerClass = params[<span class="string">@"controller_class"</span>];</span><br><span class="line"></span><br><span class="line">    <span class="built_in">UIViewController</span> *viewController = [[controllerClass alloc] init];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ([viewController respondsToSelector:<span class="keyword">@selector</span>(setParams:)]) &#123;</span><br><span class="line">        [viewController performSelector:<span class="keyword">@selector</span>(setParams:)</span><br><span class="line">                             withObject:[params <span class="keyword">copy</span>]];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> viewController;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>TZLoginViewController</code>中相应的参数都被绑定在 params 属性的字典里：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)setParams:(<span class="built_in">NSDictionary</span> *)params &#123;</span><br><span class="line">    _params = params;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"Params: %@"</span>, params);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用HHRouter大大减小了<code>UIVIewController</code>之间的相互依赖，若<code>ViewController</code>属性不断变化，我们只需要在<code>ViewController</code>中修改使用到的属性即可，它的各项参数均可通过 URL Router 的参数完成传递，大大降低了两者间的耦合度。</p>
+<h2 id="2-2-block-数据传递"><a href="#2-2-block-数据传递" class="headerlink" title="2.2 block 数据传递"></a>2.2 block 数据传递</h2><p><code>HHRouter</code>还提供了 block 传值方式，其主要包含了三个方法：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//设置路由规则</span></span><br><span class="line">- (<span class="keyword">void</span>)map:(<span class="built_in">NSString</span> *)route toBlock:(HHRouterBlock)block;</span><br><span class="line"></span><br><span class="line"><span class="comment">//匹配路由规则</span></span><br><span class="line">- (<span class="keyword">id</span>)callBlock:(<span class="built_in">NSString</span> *)route;</span><br><span class="line">- (HHRouterBlock)matchBlock:(<span class="built_in">NSString</span> *)route;</span><br></pre></td></tr></table></figure>
+<p>其中，map 用于设置路由规则，<code>matchBlock</code>用于匹配路由规则，找到指定的 block，但是不会主动调用该 block，需要在后面手动调用。<code>callBlock</code>方法在找到指定的 block 后，立即调用。</p>
+<p>设置路由规则，映射成对应的 URL：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[[HHRouter shared] map:<span class="string">@"/user/add/"</span> toBlock:^<span class="keyword">id</span>(<span class="built_in">NSDictionary</span> *params) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"b = %@"</span>, [params objectForKey:<span class="string">@"b"</span>]);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+<p>这条规则对应的会生成一个路由规则的字典：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@&#123;</span><br><span class="line">      <span class="string">@"user"</span> : @&#123;</span><br><span class="line">              <span class="string">@": add"</span> : @&#123;</span><br><span class="line">                      <span class="string">@"_"</span> = <span class="string">"&lt;__NSGlobalBlock__: 0x108edf138&gt;"</span></span><br><span class="line">                      &#125;</span><br><span class="line">              &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在对应触发事件处，匹配路由:</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[[HHRouter shared] callBlock:<span class="string">@"/user/add/?b=20"</span>];</span><br></pre></td></tr></table></figure>
+<p>匹配出的路由参数字典：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@&#123;</span><br><span class="line">      <span class="string">@"block"</span>      :   <span class="string">@"&lt;__NSGlobalBlock__: 0x108edf138&gt;"</span>,</span><br><span class="line">      <span class="string">@"router"</span>     :   <span class="string">@"/user/add/?b=20"</span>,</span><br><span class="line">      <span class="string">@"b"</span>          :   <span class="string">@"20"</span>,</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>这样匹配的参数就可以通过 block 进行回调了。</p>
+<h2 id="2-3-工厂goPage方法解析"><a href="#2-3-工厂goPage方法解析" class="headerlink" title="2.3 工厂goPage方法解析"></a>2.3 工厂<code>goPage</code>方法解析</h2><p>我们平常的项目开放中，在做组件间的跳转时总是会用到工厂的<code>goPage</code>方法，工厂<code>goPage</code>方法其实也是类似这种使用路由的方式获取相对应的控制器进行 push：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSString</span> *url = <span class="string">@"cmp://com.nd.sdp.component.transaction-flow/transaction_main_page"</span>;</span><br></pre></td></tr></table></figure>
+<p>其中<code>cmp://</code>作为匹配的 scheme，只有当 scheme 匹配成功了才会继续进行匹配，<code>com.nd.sdp.component.transaction-flow/transaction_main_page</code>是组件页面的唯一路由地址，通过<code>getPage</code>方法获取到对应的<code>APFPageWrapper</code>实例，其包含了目的控制器以及相关的参数字典,通过<code>getController</code>和<code>getParam</code>来获取：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">APFPageWrapper *pageWrapper = [<span class="keyword">self</span> getPage:uri];</span><br><span class="line">    </span><br><span class="line"><span class="comment">//获取URL匹配到的控制器</span></span><br><span class="line"><span class="built_in">UIViewController</span> *webViewController = [pageWrapper getController];</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取URL匹配到的参数</span></span><br><span class="line"><span class="built_in">NSString</span> *strTitle = [[pageWrapper getParam] objectForKey: <span class="string">@"title"</span>] ? : <span class="string">@""</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取源控制器</span></span><br><span class="line"><span class="built_in">UIViewController</span> *sourceViewController = context[KEY_CMP_SRC_CONTROLLER];</span><br><span class="line"></span><br><span class="line">[sourceViewController.navigationController pushViewController:webViewController animated:<span class="literal">YES</span>];</span><br></pre></td></tr></table></figure>
+<h1 id="三、小结"><a href="#三、小结" class="headerlink" title="三、小结"></a>三、小结</h1><h3 id="优点："><a href="#优点：" class="headerlink" title="优点："></a>优点：</h3><p>通过<code>HHrouter</code>将<code>UIViewController</code>映射成 URL，从而支持页面像 web 那样通过URL进行页面跳转，首先这能够极大的减小<code>UIViewController</code>之间的耦合度，其次当每个界面都拥有唯一且不重复的 URL，将带来额外的好处。譬如你将更容易实现 Push 打开指定的界面、追踪用户浏览记录等需求。</p>
+<h3 id="缺点："><a href="#缺点：" class="headerlink" title="缺点："></a>缺点：</h3><ul>
+<li>这种基于<code>URL Router</code>方案只能传递常规对象，无法传递自定义对象。<br></li>
+<li>URL 的 map 规则是需要注册的，它们一般会在<code>load</code>方法里面写。这样会影响 App 启动速度的。<br></li>
+<li>URL 链接里面关于组件和页面的名字都是硬编码，参数也都是硬编码。而且每个 URL 参数字段都必须要一个文档进行维护，这将对业务开发人员造成负担。</li>
+</ul>
+<h3 id="该库为使用分享，并非建议大家在项目中再次引入"><a href="#该库为使用分享，并非建议大家在项目中再次引入" class="headerlink" title="该库为使用分享，并非建议大家在项目中再次引入."></a>该库为使用分享，并非建议大家在项目中再次引入.</h3><h3 id="使用到的第三方库："><a href="#使用到的第三方库：" class="headerlink" title="使用到的第三方库："></a>使用到的第三方库：</h3><h4 id="HHRouter：https-github-com-Huohua-HHRouter"><a href="#HHRouter：https-github-com-Huohua-HHRouter" class="headerlink" title="HHRouter：https://github.com/Huohua/HHRouter"></a><code>HHRouter</code>：<a href="https://github.com/Huohua/HHRouter" target="_blank" rel="noopener">https://github.com/Huohua/HHRouter</a></h4><h4 id="CocoaPods：pod-‘HHRouter’-‘-gt-0-1-8’："><a href="#CocoaPods：pod-‘HHRouter’-‘-gt-0-1-8’：" class="headerlink" title="CocoaPods：pod ‘HHRouter’, ‘~&gt; 0.1.8’："></a>CocoaPods：pod ‘HHRouter’, ‘~&gt; 0.1.8’：</h4><p>参考链接：</p>
+<p><a href="https://github.com/Huohua/HHRouter#cocoapods" target="_blank" rel="noopener">https://github.com/Huohua/HHRouter#cocoapods</a></p>
+<p><a href="http://www.cocoachina.com/ios/20170301/18811.html" target="_blank" rel="noopener">http://www.cocoachina.com/ios/20170301/18811.html</a></p>
+<p><a href="https://segmentfault.com/a/1190000002585537" target="_blank" rel="noopener">https://segmentfault.com/a/1190000002585537</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/03/22/iOS-HHRouter/" data-id="cjv87j58o00052ny2tkimrctb" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/HHRouter/">HHRouter</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/控制器间传值/">控制器间传值</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/08/22/iOS-FBKVOController/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          FBKVOController源码分析
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/11/29/iOS-interactiveTextView/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">iOS开发 — 自定义可交互的 UITextView</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/经验总结/">经验总结</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/HHRouter/">HHRouter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KVO/">KVO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UITextView/">UITextView</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tips/">tips</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/图文混排/">图文混排</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/开发技巧/">开发技巧</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/控制器间传值/">控制器间传值</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/源码分析/">源码分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/踩坑/">踩坑</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/HHRouter/" style="font-size: 10px;">HHRouter</a> <a href="/tags/KVO/" style="font-size: 10px;">KVO</a> <a href="/tags/UITextView/" style="font-size: 10px;">UITextView</a> <a href="/tags/tips/" style="font-size: 10px;">tips</a> <a href="/tags/图文混排/" style="font-size: 10px;">图文混排</a> <a href="/tags/开发技巧/" style="font-size: 10px;">开发技巧</a> <a href="/tags/控制器间传值/" style="font-size: 10px;">控制器间传值</a> <a href="/tags/源码分析/" style="font-size: 10px;">源码分析</a> <a href="/tags/踩坑/" style="font-size: 10px;">踩坑</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/05/03/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/29/Tips/">踩坑笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/22/iOS-FBKVOController/">FBKVOController源码分析</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/22/iOS-HHRouter/">iOS开发 — HHRouter路由数据传递开发分享</a>
+          </li>
+        
+          <li>
+            <a href="/2017/11/29/iOS-interactiveTextView/">iOS开发 — 自定义可交互的 UITextView</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 TanZou<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

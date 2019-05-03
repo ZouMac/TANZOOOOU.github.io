@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>FBKVOController源码分析 | TanZoooou的博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言FBKVOController 是 Facebook 开源的接口设计优雅的 KVO 框架。研读源码有助于加深对其框架和模式的理解，将其中的一些代码技巧运用到开发工作中，以提升自身开发水平。">
+<meta name="keywords" content="KVO,源码分析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FBKVOController源码分析">
+<meta property="og:url" content="http://yoursite.com/2018/08/22/iOS-FBKVOController/index.html">
+<meta property="og:site_name" content="TanZoooou的博客">
+<meta property="og:description" content="前言FBKVOController 是 Facebook 开源的接口设计优雅的 KVO 框架。研读源码有助于加深对其框架和模式的理解，将其中的一些代码技巧运用到开发工作中，以提升自身开发水平。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-02T14:55:33.178Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="FBKVOController源码分析">
+<meta name="twitter:description" content="前言FBKVOController 是 Facebook 开源的接口设计优雅的 KVO 框架。研读源码有助于加深对其框架和模式的理解，将其中的一些代码技巧运用到开发工作中，以提升自身开发水平。">
+  
+    <link rel="alternate" href="/atom.xml" title="TanZoooou的博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">TanZoooou的博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-iOS-FBKVOController" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/22/iOS-FBKVOController/" class="article-date">
+  <time datetime="2018-08-22T03:42:50.000Z" itemprop="datePublished">2018-08-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/经验总结/">经验总结</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      FBKVOController源码分析
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>FBKVOController 是 Facebook 开源的接口设计优雅的 KVO 框架。研读源码有助于加深对其框架和模式的理解，将其中的一些代码技巧运用到开发工作中，以提升自身开发水平。</p>
+<a id="more"></a> 
+<h1 id="一、FBKVOController-简介"><a href="#一、FBKVOController-简介" class="headerlink" title="一、FBKVOController 简介"></a>一、FBKVOController 简介</h1><p>KVO (key-Value Observing) 是通过观察者监听指定<code>keyPath</code>路径下属性改变而触发响应的开发方案。开发者可以在工程中直接使用 Apple 原生的 KVO，支持多个观察者同时观察同一个<code>keyPath</code>属性。然而，Apple 原生 KVO 的使用较为麻烦，需要添加观察者，移除观察者，通知回调，且其回调方法与添加观察者方法过于分散。同时，移除未添加的观察者还会导致程序奔溃，重复添加观察者将造成回调函数执行多次。</p>
+<p>FBKVOController 是 FaceBook 开源的简化封装后的 KVO 框架。它对原生 KVO 监听函数进行了封装，使用<code>block</code>或<code>@selector(SEL)</code>的回调操作，极大的简化了 KVO 调用方式，避免了在程序中处理通知回调函数逻辑散落的到处都是。同时将移除观察者方法巧妙的放到<code>dealloc</code>方法中，实现“自释放”。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)observeValueForKeyPath:(<span class="built_in">NSString</span> *)keyPath ofObject:(<span class="keyword">id</span>)object change:(<span class="built_in">NSDictionary</span> *)change context:(<span class="keyword">void</span> *)context;</span><br></pre></td></tr></table></figure>
+<h3 id="FBKVOController-使用"><a href="#FBKVOController-使用" class="headerlink" title="FBKVOController 使用"></a>FBKVOController 使用</h3><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** 初始化KVOController有两种方式：</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> 1.创建KVOController同时让self持有KVOCOntroller</span></span><br><span class="line"><span class="comment"> FBKVOController *KVOController = [FBKVOController controllerWithObserver:self];</span></span><br><span class="line"><span class="comment"> self.KVOController = KVOController;</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> 2.使用self.KVOController或self.KVOControllerNonRetaining作为观察者（分类 NSObject+FBKVOController会以懒加载的方式动态的给对象添加KVOController、KVOControllerNonRetaining属性）[推荐]</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// observe clock对象的 date属性</span></span><br><span class="line">[<span class="keyword">self</span>.KVOController observe:clock keyPath:<span class="string">@"date"</span> options:<span class="built_in">NSKeyValueObservingOptionInitial</span> | <span class="built_in">NSKeyValueObservingOptionNew</span> block:^(ClockView *clockView, Clock *clock, <span class="built_in">NSDictionary</span> *change) &#123;</span><br><span class="line">    </span><br><span class="line">  <span class="comment">// block 回调更新 date</span></span><br><span class="line">  clockView.date = change[<span class="built_in">NSKeyValueChangeNewKey</span>];</span><br><span class="line"></span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+<h1 id="二、NSHashTable-和-NSMapTable"><a href="#二、NSHashTable-和-NSMapTable" class="headerlink" title="二、NSHashTable 和 NSMapTable"></a>二、NSHashTable 和 NSMapTable</h1><p><code>NSHashTable</code>和<code>NSMapTable</code>在平时的开发中用到的比较少，<code>NSHashTable</code>被设计为可以由于替换<code>NSMutableSet</code>的无序集。</p>
+<ul>
+<li><p><code>NSSet / NSMutableSet</code>持有成员的强引用，通过<code>hash</code>和<code>isEqual:</code>方法来检测成员的散列值和相等性。</p>
+</li>
+<li><p><code>NSHashTable</code>是可变集合</p>
+</li>
+<li><p>可通过传入<code>NSPointerFunctionsWeakMemory</code>参数弱引用储存对象，对象被释放后将自动移除</p>
+</li>
+<li><p>储存对象是无序的且不能储存相同的对象</p>
+</li>
+<li><p>在添加对象时可以复制对象后再存放</p>
+</li>
+<li><p><code>NSHashTable</code>可以存储任意的指针，通过指针来进行相等性和散列检查。</p>
+</li>
+</ul>
+<p><code>NSMapTable</code>是更广泛意义上的<code>NSMutableDictionary</code>，它可以处理<code>key -&gt; obj</code>式的映射，也可以处理<code>obj -&gt; obj</code>的映射（关联数组 map）。</p>
+<ul>
+<li><code>NSDictionary / NSMutableDictionary</code>通过mutableCopy对键值进行拷贝，copy不会进行拷贝，但会使引用计数+1。</li>
+<li><code>NSMapTable</code>是可变的</li>
+<li>可通过传入<code>NSPointerFunctionsWeakMemory</code>参数对持有的<code>keys</code>和<code>values</code>弱引用，当键或者值当中的一个被释放时，整个就会被移除掉。</li>
+<li>在添加<code>value</code>时对<code>value</code>进行复制</li>
+<li><code>NSMapTable</code>可以存储任意的指针，通过指针来进行相等性和散列检查。</li>
+</ul>
+<h1 id="三、源码分析"><a href="#三、源码分析" class="headerlink" title="三、源码分析"></a>三、源码分析</h1><h2 id="3-1、FBKVOController-框架结构"><a href="#3-1、FBKVOController-框架结构" class="headerlink" title="3.1、FBKVOController 框架结构"></a>3.1、FBKVOController 框架结构</h2><ul>
+<li><p>FBKVOController </p>
+<ul>
+<li>_FBKVOInfo </li>
+<li>_FBKVOSharedController </li>
+<li>FBKVOController </li>
+</ul>
+</li>
+<li><p>NSObject+FBKVOController </p>
+</li>
+</ul>
+<p><code>FBKVOController</code>分为三部分，其中<code>_FBKVOSharedController</code>是内部中间层，主要是用于将原生 KVO 的给观察对象添加监听的方式：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)addObserver:(<span class="built_in">NSObject</span> *)observer forKeyPath:(<span class="built_in">NSString</span> *)keyPath options:(<span class="built_in">NSKeyValueObservingOptions</span>)options context:(<span class="keyword">nullable</span> <span class="keyword">void</span> *)context;</span><br></pre></td></tr></table></figure>
+<p>转换为观察者主动观察被监听对象的方式：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)observe:(<span class="keyword">nullable</span> <span class="keyword">id</span>)object keyPath:(<span class="built_in">NSString</span> *)keyPath options:(<span class="built_in">NSKeyValueObservingOptions</span>)options block:(FBKVONotificationBlock)block;</span><br></pre></td></tr></table></figure>
+<p><code>_FBKVOInfo</code>也是内部类，用于储存 KVO 的处理内容：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">instancetype</span>)initWithController:(FBKVOController *)controller</span><br><span class="line">                           keyPath:(<span class="built_in">NSString</span> *)keyPath</span><br><span class="line">                           options:(<span class="built_in">NSKeyValueObservingOptions</span>)options</span><br><span class="line">                             block:(<span class="keyword">nullable</span> FBKVONotificationBlock)block</span><br><span class="line">                            action:(<span class="keyword">nullable</span> SEL)action</span><br><span class="line">                           context:(<span class="keyword">nullable</span> <span class="keyword">void</span> *)context;</span><br></pre></td></tr></table></figure>
+<p><code>FBKVOController</code>是实现 KVO 的主要类。<br><code>NSObject+FBKVOController</code>用于提供强引用和弱引用的<code>FBKVOController</code>。</p>
+<h2 id="3-2、FBKVOController"><a href="#3-2、FBKVOController" class="headerlink" title="3.2、FBKVOController"></a>3.2、FBKVOController</h2><h3 id="初始化-FBKVOController"><a href="#初始化-FBKVOController" class="headerlink" title="初始化 FBKVOController"></a>初始化 FBKVOController</h3><p><code>FBKVOController</code>的<code>observe</code>对象是用<code>weak</code>持有的，对传入的观察者弱引用，以避免循环引用。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@property</span> (<span class="keyword">nullable</span>, <span class="keyword">nonatomic</span>, <span class="keyword">weak</span>, <span class="keyword">readonly</span>) <span class="keyword">id</span> observer;</span><br></pre></td></tr></table></figure>
+<p><code>NSPointerFunctionsOptions</code>定义了<code>NSMapTable</code>中的<code>key</code>和<code>value</code>的内存管理策略，内存选项决定了内存管理，个性化定义了哈希和相等：</p>
+<ul>
+<li><code>NSPointerFunctionsStrongMemory</code>创建了一个<code>retain/release</code>对象的集合，非常像常规的<code>NSSet</code>或<code>NSArray</code>。 </li>
+<li><code>NSPointerFunctionsWeakMemory</code> 使用等价的<code>__weak</code>来存储对象并自动移除被销毁的对象。</li>
+<li><code>NSPointerFunctionsCopyIn</code>在对象被加入到集合前拷贝它们，支持<code>NSCopying</code>协议。</li>
+<li><code>NSPointerFunctionsObjectPersonality</code>使用对象的<code>hash</code>和<code>isEqual:</code>(默认)。=&gt; 值相等</li>
+<li><code>NSPointerFunctionsObjectPointerPersonality</code>对于<code>isEqual:</code>和<code>hash</code>使用直接的指针比较。=&gt; 指针相等</li>
+</ul>
+<p>此处<code>retainObserved = true</code> ,  定义了<code>key</code>为强引用、指针比较，<code>value</code>为强引用、值比较的<code>NSMapTable</code>对象<code>_objectInfosMap</code>。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">instancetype</span>)initWithObserver:(<span class="keyword">nullable</span> <span class="keyword">id</span>)observer retainObserved:(<span class="built_in">BOOL</span>)retainObserved</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">self</span> = [<span class="keyword">super</span> init];</span><br><span class="line">  <span class="keyword">if</span> (<span class="literal">nil</span> != <span class="keyword">self</span>) &#123;</span><br><span class="line">    _observer = observer;</span><br><span class="line">    <span class="built_in">NSPointerFunctionsOptions</span> keyOptions = retainObserved ? <span class="built_in">NSPointerFunctionsStrongMemory</span> | <span class="built_in">NSPointerFunctionsObjectPointerPersonality</span> : <span class="built_in">NSPointerFunctionsWeakMemory</span> | <span class="built_in">NSPointerFunctionsObjectPointerPersonality</span>;</span><br><span class="line">    _objectInfosMap = [[<span class="built_in">NSMapTable</span> alloc] initWithKeyOptions:keyOptions valueOptions:<span class="built_in">NSPointerFunctionsStrongMemory</span> | <span class="built_in">NSPointerFunctionsObjectPersonality</span> capacity:<span class="number">0</span>];</span><br><span class="line">    pthread_mutex_init(&amp;_lock, <span class="literal">NULL</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后初始化自旋锁，自旋锁用于避免多个线程同时操作<code>critical section</code>。</p>
+<h3 id="监听对象-keyPath"><a href="#监听对象-keyPath" class="headerlink" title="监听对象 keyPath"></a>监听对象 keyPath</h3><ul>
+<li>监听对象、属性、回调<code>block</code>必须存在。</li>
+<li>构造<code>_FBKVOInfo</code>对象，储存传入的 KVO 参数。</li>
+<li>监听</li>
+</ul>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)observe:(<span class="keyword">nullable</span> <span class="keyword">id</span>)object keyPath:(<span class="built_in">NSString</span> *)keyPath options:(<span class="built_in">NSKeyValueObservingOptions</span>)options block:(FBKVONotificationBlock)block</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">NSAssert</span>(<span class="number">0</span> != keyPath.length &amp;&amp; <span class="literal">NULL</span> != block, <span class="string">@"missing required parameters observe:%@ keyPath:%@ block:%p"</span>, object, keyPath, block);</span><br><span class="line">  <span class="keyword">if</span> (<span class="literal">nil</span> == object || <span class="number">0</span> == keyPath.length || <span class="literal">NULL</span> == block) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// create info</span></span><br><span class="line">  _FBKVOInfo *info = [[_FBKVOInfo alloc] initWithController:<span class="keyword">self</span> keyPath:keyPath options:options block:block];</span><br><span class="line"></span><br><span class="line">  <span class="comment">// observe object with info</span></span><br><span class="line">  [<span class="keyword">self</span> _observe:object info:info];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>调用内部监听方法：</p>
+<ul>
+<li>首先开启自旋锁，防止其他线程操作干扰。</li>
+<li>根据被观察的对象获取 <code>infos</code>，避免对同一个<code>keyPath</code>添加多次观察，防止奔溃。</li>
+<li>如果没有与此次观察相同的<code>info</code>，则将<code>info</code>添加到<code>_objectInfosMap</code>的<code>infos</code>中，并注册到中间层<code>_FBKVOSharedController</code>中。</li>
+</ul>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)_observe:(<span class="keyword">id</span>)object info:(_FBKVOInfo *)info</span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">// lock</span></span><br><span class="line">  pthread_mutex_lock(&amp;_lock);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">NSMutableSet</span> *infos = [_objectInfosMap objectForKey:object];</span><br><span class="line"></span><br><span class="line">  <span class="comment">// check for info existence</span></span><br><span class="line">  _FBKVOInfo *existingInfo = [infos member:info];</span><br><span class="line">  <span class="keyword">if</span> (<span class="literal">nil</span> != existingInfo) &#123;</span><br><span class="line">    <span class="comment">// observation info already exists; do not observe it again</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// unlock and return</span></span><br><span class="line">    pthread_mutex_unlock(&amp;_lock);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// lazilly create set of infos</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="literal">nil</span> == infos) &#123;</span><br><span class="line">    infos = [<span class="built_in">NSMutableSet</span> set];</span><br><span class="line">    [_objectInfosMap setObject:infos forKey:object];</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// add info and oberve</span></span><br><span class="line">  [infos addObject:info];</span><br><span class="line"></span><br><span class="line">  <span class="comment">// unlock prior to callout</span></span><br><span class="line">  pthread_mutex_unlock(&amp;_lock);</span><br><span class="line"></span><br><span class="line">  [[_FBKVOSharedController sharedController] observe:object info:info];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="中间层-FBKVOSharedController-转发处理"><a href="#中间层-FBKVOSharedController-转发处理" class="headerlink" title="中间层 _FBKVOSharedController 转发处理"></a>中间层 _FBKVOSharedController 转发处理</h3><p><code>_FBKVOSharedController</code> 使用原生 KVO 对传进来的<code>object</code>进行观察。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)observe:(<span class="keyword">id</span>)object info:(<span class="keyword">nullable</span> _FBKVOInfo *)info</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="literal">nil</span> == info) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// register info</span></span><br><span class="line">  pthread_mutex_lock(&amp;_mutex);</span><br><span class="line">  [_infos addObject:info];</span><br><span class="line">  pthread_mutex_unlock(&amp;_mutex);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// add observer</span></span><br><span class="line">  [object addObserver:<span class="keyword">self</span> forKeyPath:info-&gt;_keyPath options:info-&gt;_options context:(<span class="keyword">void</span> *)info];</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (info-&gt;_state == _FBKVOInfoStateInitial) &#123;</span><br><span class="line">    info-&gt;_state = _FBKVOInfoStateObserving;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (info-&gt;_state == _FBKVOInfoStateNotObserving) &#123;</span><br><span class="line">    <span class="comment">// this could happen when `NSKeyValueObservingOptionInitial` is one of the NSKeyValueObservingOptions,</span></span><br><span class="line">    <span class="comment">// and the observer is unregistered within the callback block.</span></span><br><span class="line">    <span class="comment">// at this time the object has been registered as an observer (in Foundation KVO),</span></span><br><span class="line">    <span class="comment">// so we can safely unobserve it.</span></span><br><span class="line">    [object removeObserver:<span class="keyword">self</span> forKeyPath:info-&gt;_keyPath context:(<span class="keyword">void</span> *)info];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>并在响应方法中，将原生 KVO 的给观察对象添加监听的方式转换为观察者主动观察被监听对象的方式, 并将监听到的<code>change</code>赋值到<code>block</code>中进行传递：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)observeValueForKeyPath:(<span class="keyword">nullable</span> <span class="built_in">NSString</span> *)keyPath</span><br><span class="line">                      ofObject:(<span class="keyword">nullable</span> <span class="keyword">id</span>)object</span><br><span class="line">                        change:(<span class="keyword">nullable</span> <span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSKeyValueChangeKey</span>, <span class="keyword">id</span>&gt; *)change</span><br><span class="line">                       context:(<span class="keyword">nullable</span> <span class="keyword">void</span> *)context</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">NSAssert</span>(context, <span class="string">@"missing context keyPath:%@ object:%@ change:%@"</span>, keyPath, object, change);</span><br><span class="line"></span><br><span class="line">  _FBKVOInfo *info;</span><br><span class="line"></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="comment">// lookup context in registered infos, taking out a strong reference only if it exists</span></span><br><span class="line">    pthread_mutex_lock(&amp;_mutex);</span><br><span class="line">    info = [_infos member:(__bridge <span class="keyword">id</span>)context];</span><br><span class="line">    pthread_mutex_unlock(&amp;_mutex);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (<span class="literal">nil</span> != info) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// take strong reference to controller</span></span><br><span class="line">    FBKVOController *controller = info-&gt;_controller;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">nil</span> != controller) &#123;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// take strong reference to observer</span></span><br><span class="line">      <span class="keyword">id</span> observer = controller.observer;</span><br><span class="line">      <span class="keyword">if</span> (<span class="literal">nil</span> != observer) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// dispatch custom block or action, fall back to default action</span></span><br><span class="line">        <span class="keyword">if</span> (info-&gt;_block) &#123;</span><br><span class="line">          <span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSKeyValueChangeKey</span>, <span class="keyword">id</span>&gt; *changeWithKeyPath = change;</span><br><span class="line">          <span class="comment">// add the keyPath to the change dictionary for clarity when mulitple keyPaths are being observed</span></span><br><span class="line">          <span class="keyword">if</span> (keyPath) &#123;</span><br><span class="line">            <span class="built_in">NSMutableDictionary</span>&lt;<span class="built_in">NSString</span> *, <span class="keyword">id</span>&gt; *mChange = [<span class="built_in">NSMutableDictionary</span> dictionaryWithObject:keyPath forKey:FBKVONotificationKeyPathKey];</span><br><span class="line">            [mChange addEntriesFromDictionary:change];</span><br><span class="line">            changeWithKeyPath = [mChange <span class="keyword">copy</span>];</span><br><span class="line">          &#125;</span><br><span class="line">          info-&gt;_block(observer, object, changeWithKeyPath);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (info-&gt;_action) &#123;</span><br><span class="line"><span class="meta">#pragma clang diagnostic push</span></span><br><span class="line"><span class="meta">#pragma clang diagnostic ignored <span class="meta-string">"-Warc-performSelector-leaks"</span></span></span><br><span class="line">          [observer performSelector:info-&gt;_action withObject:change withObject:object];</span><br><span class="line"><span class="meta">#pragma clang diagnostic pop</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          [observer observeValueForKeyPath:keyPath ofObject:object change:change context:info-&gt;_context];</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="循环引用"><a href="#循环引用" class="headerlink" title="循环引用"></a>循环引用</h3><p>在以下<code>block</code>中使用到 <code>self</code>，势必会造成循环引用的问题，但是要给<code>self.layer</code>赋值，那就需要加上<code>@weakify(self)；</code>。为了解决这个问题， FBKVOController 做了巧妙的处理：初始化时将<code>observe</code>传入，并做了<code>weak</code>处理，对其弱引用，最后再将<code>observe</code>添加到<code>block</code>回调中，这样就可以直接在<code>block</code>回调中使用<code>observe</code>来替代<code>self</code>。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[<span class="keyword">self</span>.KVOController observe:clock keyPath:<span class="string">@"date"</span> options:<span class="built_in">NSKeyValueObservingOptionInitial</span> | <span class="built_in">NSKeyValueObservingOptionNew</span> block:^(ClockView *clockView, Clock *clock, <span class="built_in">NSDictionary</span> *change) &#123;</span><br><span class="line">      <span class="comment">// update observer with new value</span></span><br><span class="line">      clockView.layer.date = change[<span class="built_in">NSKeyValueChangeNewKey</span>];</span><br><span class="line"> &#125;];</span><br></pre></td></tr></table></figure>
+<h3 id="移除监听"><a href="#移除监听" class="headerlink" title="移除监听"></a>移除监听</h3><p><code>FBKVOController</code>实现了自释放，<code>self.KVOController</code>会随着观察者释放而释放，当<code>KVOController</code>释放时，在其<code>dealloc</code>方法中移除监听，巧妙的将观察者的<code>remove</code>转移到动态属性的<code>dealloc</code>函数中。</p>
+<h1 id="四、小结"><a href="#四、小结" class="headerlink" title="四、小结"></a>四、小结</h1><h3 id="优点："><a href="#优点：" class="headerlink" title="优点："></a>优点：</h3><ul>
+<li><p>它对原生KVO监听函数进行了封装，使用<code>block</code>或<code>@selector(SEL)</code>的回调操作，极大的简化了 KVO 调用方式，避免了在程序中处理通知回调函数逻辑散落的到处都是。<br></p>
+</li>
+<li><p>将移除观察者方法巧妙的放到<code>dealloc</code>方法中，实现“自释放”。<br></p>
+</li>
+</ul>
+<h3 id="缺点："><a href="#缺点：" class="headerlink" title="缺点："></a>缺点：</h3><ul>
+<li>无法监听自己的属性,会造成循环引用。<br></li>
+</ul>
+<h1 id="参考链接："><a href="#参考链接：" class="headerlink" title="参考链接："></a>参考链接：</h1><p><a href="http://www.isaced.com/post-235.html" target="_blank" rel="noopener">http://www.isaced.com/post-235.html</a><br></p>
+<p><a href="https://github.com/facebook/KVOController" target="_blank" rel="noopener">FBKVOController</a><br></p>
+<p><a href="https://nshipster.cn/nshashtable-and-nsmaptable/" target="_blank" rel="noopener">https://nshipster.cn/nshashtable-and-nsmaptable/</a><br></p>
+<p><a href="https://mp.weixin.qq.com/s/ZrJhx8ItmUBco0frxl2NJw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/ZrJhx8ItmUBco0frxl2NJw</a><br></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/08/22/iOS-FBKVOController/" data-id="cjv87j58n00042ny2v5hq3bfz" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/KVO/">KVO</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/源码分析/">源码分析</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/11/29/Tips/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          踩坑笔记
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/22/iOS-HHRouter/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">iOS开发 — HHRouter路由数据传递开发分享</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/经验总结/">经验总结</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/HHRouter/">HHRouter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KVO/">KVO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UITextView/">UITextView</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tips/">tips</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/图文混排/">图文混排</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/开发技巧/">开发技巧</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/控制器间传值/">控制器间传值</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/源码分析/">源码分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/踩坑/">踩坑</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/HHRouter/" style="font-size: 10px;">HHRouter</a> <a href="/tags/KVO/" style="font-size: 10px;">KVO</a> <a href="/tags/UITextView/" style="font-size: 10px;">UITextView</a> <a href="/tags/tips/" style="font-size: 10px;">tips</a> <a href="/tags/图文混排/" style="font-size: 10px;">图文混排</a> <a href="/tags/开发技巧/" style="font-size: 10px;">开发技巧</a> <a href="/tags/控制器间传值/" style="font-size: 10px;">控制器间传值</a> <a href="/tags/源码分析/" style="font-size: 10px;">源码分析</a> <a href="/tags/踩坑/" style="font-size: 10px;">踩坑</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/05/03/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/11/29/Tips/">踩坑笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/22/iOS-FBKVOController/">FBKVOController源码分析</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/22/iOS-HHRouter/">iOS开发 — HHRouter路由数据传递开发分享</a>
+          </li>
+        
+          <li>
+            <a href="/2017/11/29/iOS-interactiveTextView/">iOS开发 — 自定义可交互的 UITextView</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 TanZou<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
