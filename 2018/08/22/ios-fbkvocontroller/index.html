@@ -1,0 +1,995 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="FBKVOController源码分析, null">
+    <meta name="description" content="前言FBKVOController 是 Facebook 开源的接口设计优雅的 KVO 框架。研读源码有助于加深对其框架和模式的理解，将其中的一些代码技巧运用到开发工作中，以提升自身开发水平。
+ 
+一、FBKVOController 简介K">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>FBKVOController源码分析 | null</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    <style type="text/css">
+        
+    </style>
+
+    <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+
+<header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span"></span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fa fa-navicon"></i></a>
+<ul class="right">
+    
+    <li class="hide-on-med-and-down">
+        <a href="/" class="waves-effect waves-light">
+            
+            <i class="fa fa-home"></i>
+            
+            <span>首页</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/tags" class="waves-effect waves-light">
+            
+            <i class="fa fa-tags"></i>
+            
+            <span>标签</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/categories" class="waves-effect waves-light">
+            
+            <i class="fa fa-bookmark"></i>
+            
+            <span>分类</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/archives" class="waves-effect waves-light">
+            
+            <i class="fa fa-archive"></i>
+            
+            <span>归档</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/about" class="waves-effect waves-light">
+            
+            <i class="fa fa-user-circle-o"></i>
+            
+            <span>关于</span>
+        </a>
+    </li>
+    
+    <li>
+        <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+            <i id="searchIcon" class="fa fa-search" title="搜索"></i>
+        </a>
+    </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name"></div>
+        <div class="logo-desc">
+            
+            Talk is cheap. Show me the code.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li>
+            <a href="/" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-home"></i>
+                
+                首页
+            </a>
+        </li>
+        
+        <li>
+            <a href="/tags" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-tags"></i>
+                
+                标签
+            </a>
+        </li>
+        
+        <li>
+            <a href="/categories" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-bookmark"></i>
+                
+                分类
+            </a>
+        </li>
+        
+        <li>
+            <a href="/archives" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-archive"></i>
+                
+                归档
+            </a>
+        </li>
+        
+        <li>
+            <a href="/about" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-user-circle-o"></i>
+                
+                关于
+            </a>
+        </li>
+        
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/7.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        FBKVOController源码分析
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 20px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/KVO/" target="_blank">
+                                <span class="chip bg-color">KVO</span>
+                            </a>
+                        
+                            <a href="/tags/源码分析/" target="_blank">
+                                <span class="chip bg-color">源码分析</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fa fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/源码学习/" class="post-category" target="_blank">
+                                源码学习
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                <div class="post-date info-break-policy">
+                    <i class="fa fa-calendar-minus-o fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-08-22
+                </div>
+
+                
+                    
+                    <div class="info-break-policy">
+                        <i class="fa fa-file-word-o fa-fw"></i>文章字数:&nbsp;&nbsp;
+                        2.1k
+                    </div>
+                    
+
+                    
+                    <div class="info-break-policy">
+                        <i class="fa fa-clock-o fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                        9 分
+                    </div>
+                    
+                
+				
+				
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="fa fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>FBKVOController 是 Facebook 开源的接口设计优雅的 KVO 框架。研读源码有助于加深对其框架和模式的理解，将其中的一些代码技巧运用到开发工作中，以提升自身开发水平。</p>
+<a id="more"></a> 
+<h1 id="一、FBKVOController-简介"><a href="#一、FBKVOController-简介" class="headerlink" title="一、FBKVOController 简介"></a>一、FBKVOController 简介</h1><p>KVO (key-Value Observing) 是通过观察者监听指定<code>keyPath</code>路径下属性改变而触发响应的开发方案。开发者可以在工程中直接使用 Apple 原生的 KVO，支持多个观察者同时观察同一个<code>keyPath</code>属性。然而，Apple 原生 KVO 的使用较为麻烦，需要添加观察者，移除观察者，通知回调，且其回调方法与添加观察者方法过于分散。同时，移除未添加的观察者还会导致程序奔溃，重复添加观察者将造成回调函数执行多次。</p>
+<p>FBKVOController 是 FaceBook 开源的简化封装后的 KVO 框架。它对原生 KVO 监听函数进行了封装，使用<code>block</code>或<code>@selector(SEL)</code>的回调操作，极大的简化了 KVO 调用方式，避免了在程序中处理通知回调函数逻辑散落的到处都是。同时将移除观察者方法巧妙的放到<code>dealloc</code>方法中，实现“自释放”。</p>
+<pre class=" language-objc"><code class="language-objc">- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context;
+</code></pre>
+<h3 id="FBKVOController-使用"><a href="#FBKVOController-使用" class="headerlink" title="FBKVOController 使用"></a>FBKVOController 使用</h3><pre class=" language-objc"><code class="language-objc">/** 初始化KVOController有两种方式：
+
+ 1.创建KVOController同时让self持有KVOCOntroller
+ FBKVOController *KVOController = [FBKVOController controllerWithObserver:self];
+ self.KVOController = KVOController;
+
+ 2.使用self.KVOController或self.KVOControllerNonRetaining作为观察者（分类 NSObject+FBKVOController会以懒加载的方式动态的给对象添加KVOController、KVOControllerNonRetaining属性）[推荐]
+
+ */
+
+// observe clock对象的 date属性
+[self.KVOController observe:clock keyPath:@"date" options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew block:^(ClockView *clockView, Clock *clock, NSDictionary *change) {
+
+  // block 回调更新 date
+  clockView.date = change[NSKeyValueChangeNewKey];
+
+}];
+
+</code></pre>
+<h1 id="二、NSHashTable-和-NSMapTable"><a href="#二、NSHashTable-和-NSMapTable" class="headerlink" title="二、NSHashTable 和 NSMapTable"></a>二、NSHashTable 和 NSMapTable</h1><p><code>NSHashTable</code>和<code>NSMapTable</code>在平时的开发中用到的比较少，<code>NSHashTable</code>被设计为可以由于替换<code>NSMutableSet</code>的无序集。</p>
+<ul>
+<li><p><code>NSSet / NSMutableSet</code>持有成员的强引用，通过<code>hash</code>和<code>isEqual:</code>方法来检测成员的散列值和相等性。</p>
+</li>
+<li><p><code>NSHashTable</code>是可变集合</p>
+</li>
+<li><p>可通过传入<code>NSPointerFunctionsWeakMemory</code>参数弱引用储存对象，对象被释放后将自动移除</p>
+</li>
+<li><p>储存对象是无序的且不能储存相同的对象</p>
+</li>
+<li><p>在添加对象时可以复制对象后再存放</p>
+</li>
+<li><p><code>NSHashTable</code>可以存储任意的指针，通过指针来进行相等性和散列检查。</p>
+</li>
+</ul>
+<p><code>NSMapTable</code>是更广泛意义上的<code>NSMutableDictionary</code>，它可以处理<code>key -&gt; obj</code>式的映射，也可以处理<code>obj -&gt; obj</code>的映射（关联数组 map）。</p>
+<ul>
+<li><code>NSDictionary / NSMutableDictionary</code>通过mutableCopy对键值进行拷贝，copy不会进行拷贝，但会使引用计数+1。</li>
+<li><code>NSMapTable</code>是可变的</li>
+<li>可通过传入<code>NSPointerFunctionsWeakMemory</code>参数对持有的<code>keys</code>和<code>values</code>弱引用，当键或者值当中的一个被释放时，整个就会被移除掉。</li>
+<li>在添加<code>value</code>时对<code>value</code>进行复制</li>
+<li><code>NSMapTable</code>可以存储任意的指针，通过指针来进行相等性和散列检查。</li>
+</ul>
+<h1 id="三、源码分析"><a href="#三、源码分析" class="headerlink" title="三、源码分析"></a>三、源码分析</h1><h2 id="3-1、FBKVOController-框架结构"><a href="#3-1、FBKVOController-框架结构" class="headerlink" title="3.1、FBKVOController 框架结构"></a>3.1、FBKVOController 框架结构</h2><ul>
+<li><p>FBKVOController </p>
+<ul>
+<li>_FBKVOInfo </li>
+<li>_FBKVOSharedController </li>
+<li>FBKVOController </li>
+</ul>
+</li>
+<li><p>NSObject+FBKVOController </p>
+</li>
+</ul>
+<p><code>FBKVOController</code>分为三部分，其中<code>_FBKVOSharedController</code>是内部中间层，主要是用于将原生 KVO 的给观察对象添加监听的方式：</p>
+<pre class=" language-objc"><code class="language-objc">- (void)addObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(nullable void *)context;
+</code></pre>
+<p>转换为观察者主动观察被监听对象的方式：</p>
+<pre class=" language-objc"><code class="language-objc">- (void)observe:(nullable id)object keyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options block:(FBKVONotificationBlock)block;
+</code></pre>
+<p><code>_FBKVOInfo</code>也是内部类，用于储存 KVO 的处理内容：</p>
+<pre class=" language-objc"><code class="language-objc">- (instancetype)initWithController:(FBKVOController *)controller
+                           keyPath:(NSString *)keyPath
+                           options:(NSKeyValueObservingOptions)options
+                             block:(nullable FBKVONotificationBlock)block
+                            action:(nullable SEL)action
+                           context:(nullable void *)context;
+</code></pre>
+<p><code>FBKVOController</code>是实现 KVO 的主要类。<br><code>NSObject+FBKVOController</code>用于提供强引用和弱引用的<code>FBKVOController</code>。</p>
+<h2 id="3-2、FBKVOController"><a href="#3-2、FBKVOController" class="headerlink" title="3.2、FBKVOController"></a>3.2、FBKVOController</h2><h3 id="初始化-FBKVOController"><a href="#初始化-FBKVOController" class="headerlink" title="初始化 FBKVOController"></a>初始化 FBKVOController</h3><p><code>FBKVOController</code>的<code>observe</code>对象是用<code>weak</code>持有的，对传入的观察者弱引用，以避免循环引用。</p>
+<pre class=" language-objc"><code class="language-objc">@property (nullable, nonatomic, weak, readonly) id observer;
+</code></pre>
+<p><code>NSPointerFunctionsOptions</code>定义了<code>NSMapTable</code>中的<code>key</code>和<code>value</code>的内存管理策略，内存选项决定了内存管理，个性化定义了哈希和相等：</p>
+<ul>
+<li><code>NSPointerFunctionsStrongMemory</code>创建了一个<code>retain/release</code>对象的集合，非常像常规的<code>NSSet</code>或<code>NSArray</code>。 </li>
+<li><code>NSPointerFunctionsWeakMemory</code> 使用等价的<code>__weak</code>来存储对象并自动移除被销毁的对象。</li>
+<li><code>NSPointerFunctionsCopyIn</code>在对象被加入到集合前拷贝它们，支持<code>NSCopying</code>协议。</li>
+<li><code>NSPointerFunctionsObjectPersonality</code>使用对象的<code>hash</code>和<code>isEqual:</code>(默认)。=&gt; 值相等</li>
+<li><code>NSPointerFunctionsObjectPointerPersonality</code>对于<code>isEqual:</code>和<code>hash</code>使用直接的指针比较。=&gt; 指针相等</li>
+</ul>
+<p>此处<code>retainObserved = true</code> ,  定义了<code>key</code>为强引用、指针比较，<code>value</code>为强引用、值比较的<code>NSMapTable</code>对象<code>_objectInfosMap</code>。</p>
+<pre class=" language-objc"><code class="language-objc">- (instancetype)initWithObserver:(nullable id)observer retainObserved:(BOOL)retainObserved
+{
+  self = [super init];
+  if (nil != self) {
+    _observer = observer;
+    NSPointerFunctionsOptions keyOptions = retainObserved ? NSPointerFunctionsStrongMemory | NSPointerFunctionsObjectPointerPersonality : NSPointerFunctionsWeakMemory | NSPointerFunctionsObjectPointerPersonality;
+    _objectInfosMap = [[NSMapTable alloc] initWithKeyOptions:keyOptions valueOptions:NSPointerFunctionsStrongMemory | NSPointerFunctionsObjectPersonality capacity:0];
+    pthread_mutex_init(&_lock, NULL);
+  }
+  return self;
+}
+</code></pre>
+<p>最后初始化自旋锁，自旋锁用于避免多个线程同时操作<code>critical section</code>。</p>
+<h3 id="监听对象-keyPath"><a href="#监听对象-keyPath" class="headerlink" title="监听对象 keyPath"></a>监听对象 keyPath</h3><ul>
+<li>监听对象、属性、回调<code>block</code>必须存在。</li>
+<li>构造<code>_FBKVOInfo</code>对象，储存传入的 KVO 参数。</li>
+<li>监听</li>
+</ul>
+<pre class=" language-objc"><code class="language-objc">- (void)observe:(nullable id)object keyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options block:(FBKVONotificationBlock)block
+{
+  NSAssert(0 != keyPath.length && NULL != block, @"missing required parameters observe:%@ keyPath:%@ block:%p", object, keyPath, block);
+  if (nil == object || 0 == keyPath.length || NULL == block) {
+    return;
+  }
+
+  // create info
+  _FBKVOInfo *info = [[_FBKVOInfo alloc] initWithController:self keyPath:keyPath options:options block:block];
+
+  // observe object with info
+  [self _observe:object info:info];
+}
+
+</code></pre>
+<p>调用内部监听方法：</p>
+<ul>
+<li>首先开启自旋锁，防止其他线程操作干扰。</li>
+<li>根据被观察的对象获取 <code>infos</code>，避免对同一个<code>keyPath</code>添加多次观察，防止奔溃。</li>
+<li>如果没有与此次观察相同的<code>info</code>，则将<code>info</code>添加到<code>_objectInfosMap</code>的<code>infos</code>中，并注册到中间层<code>_FBKVOSharedController</code>中。</li>
+</ul>
+<pre class=" language-objc"><code class="language-objc">- (void)_observe:(id)object info:(_FBKVOInfo *)info
+{
+  // lock
+  pthread_mutex_lock(&_lock);
+
+  NSMutableSet *infos = [_objectInfosMap objectForKey:object];
+
+  // check for info existence
+  _FBKVOInfo *existingInfo = [infos member:info];
+  if (nil != existingInfo) {
+    // observation info already exists; do not observe it again
+
+    // unlock and return
+    pthread_mutex_unlock(&_lock);
+    return;
+  }
+
+  // lazilly create set of infos
+  if (nil == infos) {
+    infos = [NSMutableSet set];
+    [_objectInfosMap setObject:infos forKey:object];
+  }
+
+  // add info and oberve
+  [infos addObject:info];
+
+  // unlock prior to callout
+  pthread_mutex_unlock(&_lock);
+
+  [[_FBKVOSharedController sharedController] observe:object info:info];
+}
+</code></pre>
+<h3 id="中间层-FBKVOSharedController-转发处理"><a href="#中间层-FBKVOSharedController-转发处理" class="headerlink" title="中间层 _FBKVOSharedController 转发处理"></a>中间层 _FBKVOSharedController 转发处理</h3><p><code>_FBKVOSharedController</code> 使用原生 KVO 对传进来的<code>object</code>进行观察。</p>
+<pre class=" language-objc"><code class="language-objc">- (void)observe:(id)object info:(nullable _FBKVOInfo *)info
+{
+  if (nil == info) {
+    return;
+  }
+
+  // register info
+  pthread_mutex_lock(&_mutex);
+  [_infos addObject:info];
+  pthread_mutex_unlock(&_mutex);
+
+  // add observer
+  [object addObserver:self forKeyPath:info->_keyPath options:info->_options context:(void *)info];
+
+  if (info->_state == _FBKVOInfoStateInitial) {
+    info->_state = _FBKVOInfoStateObserving;
+  } else if (info->_state == _FBKVOInfoStateNotObserving) {
+    // this could happen when `NSKeyValueObservingOptionInitial` is one of the NSKeyValueObservingOptions,
+    // and the observer is unregistered within the callback block.
+    // at this time the object has been registered as an observer (in Foundation KVO),
+    // so we can safely unobserve it.
+    [object removeObserver:self forKeyPath:info->_keyPath context:(void *)info];
+  }
+}
+
+</code></pre>
+<p>并在响应方法中，将原生 KVO 的给观察对象添加监听的方式转换为观察者主动观察被监听对象的方式, 并将监听到的<code>change</code>赋值到<code>block</code>中进行传递：</p>
+<pre class=" language-objc"><code class="language-objc">- (void)observeValueForKeyPath:(nullable NSString *)keyPath
+                      ofObject:(nullable id)object
+                        change:(nullable NSDictionary<nskeyvaluechangekey, id> *)change
+                       context:(nullable void *)context
+{
+  NSAssert(context, @"missing context keyPath:%@ object:%@ change:%@", keyPath, object, change);
+
+  _FBKVOInfo *info;
+
+  {
+    // lookup context in registered infos, taking out a strong reference only if it exists
+    pthread_mutex_lock(&_mutex);
+    info = [_infos member:(__bridge id)context];
+    pthread_mutex_unlock(&_mutex);
+  }
+
+  if (nil != info) {
+
+    // take strong reference to controller
+    FBKVOController *controller = info->_controller;
+    if (nil != controller) {
+
+      // take strong reference to observer
+      id observer = controller.observer;
+      if (nil != observer) {
+
+        // dispatch custom block or action, fall back to default action
+        if (info->_block) {
+          NSDictionary<nskeyvaluechangekey, id> *changeWithKeyPath = change;
+          // add the keyPath to the change dictionary for clarity when mulitple keyPaths are being observed
+          if (keyPath) {
+            NSMutableDictionary<nsstring *, id> *mChange = [NSMutableDictionary dictionaryWithObject:keyPath forKey:FBKVONotificationKeyPathKey];
+            [mChange addEntriesFromDictionary:change];
+            changeWithKeyPath = [mChange copy];
+          }
+          info->_block(observer, object, changeWithKeyPath);
+        } else if (info->_action) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+          [observer performSelector:info->_action withObject:change withObject:object];
+#pragma clang diagnostic pop
+        } else {
+          [observer observeValueForKeyPath:keyPath ofObject:object change:change context:info->_context];
+        }
+      }
+    }
+  }
+}
+</nsstring></nskeyvaluechangekey,></nskeyvaluechangekey,></code></pre>
+<h3 id="循环引用"><a href="#循环引用" class="headerlink" title="循环引用"></a>循环引用</h3><p>在以下<code>block</code>中使用到 <code>self</code>，势必会造成循环引用的问题，但是要给<code>self.layer</code>赋值，那就需要加上<code>@weakify(self)；</code>。为了解决这个问题， FBKVOController 做了巧妙的处理：初始化时将<code>observe</code>传入，并做了<code>weak</code>处理，对其弱引用，最后再将<code>observe</code>添加到<code>block</code>回调中，这样就可以直接在<code>block</code>回调中使用<code>observe</code>来替代<code>self</code>。</p>
+<pre class=" language-objc"><code class="language-objc">[self.KVOController observe:clock keyPath:@"date" options:NSKeyValueObservingOptionInitial | NSKeyValueObservingOptionNew block:^(ClockView *clockView, Clock *clock, NSDictionary *change) {
+      // update observer with new value
+      clockView.layer.date = change[NSKeyValueChangeNewKey];
+ }];
+</code></pre>
+<h3 id="移除监听"><a href="#移除监听" class="headerlink" title="移除监听"></a>移除监听</h3><p><code>FBKVOController</code>实现了自释放，<code>self.KVOController</code>会随着观察者释放而释放，当<code>KVOController</code>释放时，在其<code>dealloc</code>方法中移除监听，巧妙的将观察者的<code>remove</code>转移到动态属性的<code>dealloc</code>函数中。</p>
+<h1 id="四、小结"><a href="#四、小结" class="headerlink" title="四、小结"></a>四、小结</h1><h3 id="优点："><a href="#优点：" class="headerlink" title="优点："></a>优点：</h3><ul>
+<li><p>它对原生KVO监听函数进行了封装，使用<code>block</code>或<code>@selector(SEL)</code>的回调操作，极大的简化了 KVO 调用方式，避免了在程序中处理通知回调函数逻辑散落的到处都是。<br></p>
+</li>
+<li><p>将移除观察者方法巧妙的放到<code>dealloc</code>方法中，实现“自释放”。<br></p>
+</li>
+</ul>
+<h3 id="缺点："><a href="#缺点：" class="headerlink" title="缺点："></a>缺点：</h3><ul>
+<li>无法监听自己的属性,会造成循环引用。<br></li>
+</ul>
+<h1 id="参考链接："><a href="#参考链接：" class="headerlink" title="参考链接："></a>参考链接：</h1><p><a href="http://www.isaced.com/post-235.html" target="_blank" rel="noopener">http://www.isaced.com/post-235.html</a><br></p>
+<p><a href="https://github.com/facebook/KVOController" target="_blank" rel="noopener">FBKVOController</a><br></p>
+<p><a href="https://nshipster.cn/nshashtable-and-nsmaptable/" target="_blank" rel="noopener">https://nshipster.cn/nshashtable-and-nsmaptable/</a><br></p>
+<p><a href="https://mp.weixin.qq.com/s/ZrJhx8ItmUBco0frxl2NJw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/ZrJhx8ItmUBco0frxl2NJw</a><br></p>
+
+            </div>
+            <hr>
+
+            
+
+            <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<div id="article-share">
+    
+    <div class="social-share" data-disabled="qzone" data-wechat-qrcode-helper="<p>微信里点“发现”->“扫一扫”二维码便可查看分享。</p>"></div>
+    
+</div>
+
+<script src="/libs/share/js/social-share.min.js"></script>
+
+            <div class="reprint">
+                <p>
+                    <span class="reprint-tip">
+                        <i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;转载请注明:
+                    </span>
+                    <a href="http://yoursite.com" class="b-link-green"></a>
+                    <i class="fa fa-angle-right fa-lg fa-fw text-color"></i>
+                    <a href="/2018/08/22/ios-fbkvocontroller/" class="b-link-green">FBKVOController源码分析</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    
+
+    
+
+    
+        <div class="disqus-card card" data-aos="fade-up">
+    <div id="disqus_thread" class="card-content">
+        <noscript>Please enable JavaScript to view the
+            <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+    </div>
+</div>
+
+<script type="text/javascript">
+    disqus_config = function () {
+        this.page.url = 'http://yoursite.com/2018/08/22/ios-fbkvocontroller/';
+        this.page.identifier = '/2018/08/22/ios-fbkvocontroller/';
+        this.page.title = 'FBKVOController源码分析';
+    };
+    let disqus_shortname = 'tanzou';
+
+    (function () { // DON'T EDIT BELOW THIS LINE
+        let d = document, s = d.createElement('script');
+        // 如：s.src = 'https://blinkfox.disqus.com/embed.js';
+        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6 overflow-policy" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2018/10/21/jspatch/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/0.jpg" class="responsive-img" alt="JSPatch学习实践">
+                        
+                        <span class="card-title">JSPatch学习实践</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            JSPatch介绍JSPatch是一个开源的项目Github，只需要在项目里引入极小的引擎文件，就可以使用 JavaScript 调用任何 Objective-C 的原生接口，替换任意 Objective-C 原生方法。目前主要用于下发 J
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2018-10-21
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/经验总结/" class="post-category" target="_blank">
+                                    经验总结
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/JSPatch/" target="_blank">
+                        <span class="chip bg-color">JSPatch</span>
+                    </a>
+                    
+                    <a href="/tags/热修复/" target="_blank">
+                        <span class="chip bg-color">热修复</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6 overflow-policy" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fa fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2018/06/17/splinter/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="python使用splinter实现SDP组件自动化发布">
+                        
+                        <span class="card-title">python使用splinter实现SDP组件自动化发布</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            # 
+背景
+在ND项目开发中，每码完一个版本的代码或是改完bug都需要发布到SDP上，以便打包测试。
+发布代码涉及打标签、检查podfile与podspec一致性（appfactory已提供验证方法）、发布等过程。发布流程较为麻烦。
+开发者
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2018-06-17
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/python/" class="post-category" target="_blank">
+                                    python
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/python/" target="_blank">
+                        <span class="chip bg-color">python</span>
+                    </a>
+                    
+                    <a href="/tags/splinter/" target="_blank">
+                        <span class="chip bg-color">splinter</span>
+                    </a>
+                    
+                    <a href="/tags/自动化发布/" target="_blank">
+                        <span class="chip bg-color">自动化发布</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+</div>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="fa fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fa fa-list"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            // headingsOffset: -205,
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).slideUp(500);
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).slideDown(500);
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+    
+
+</main>
+
+
+<footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            本站由&copy;<a href="https://blinkfox.github.io/" target="_blank">Blinkfox</a>基于
+            <a href="https://hexo.io/" target="_blank">Hexo</a> 的
+            <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">hexo-theme-matery</a>主题搭建.
+
+            
+                &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;
+                <span class="white-color">15.9k</span>
+            
+
+            
+			
+                <br>
+                
+                <span id="busuanzi_container_site_pv">
+                    <i class="fa fa-heart-o"></i>
+                    本站总访问量 <span id="busuanzi_value_site_pv" class="white-color"></span>
+                </span>
+                
+                
+                <span id="busuanzi_container_site_uv">
+                    <i class="fa fa-users"></i>
+                    次,&nbsp;访客数 <span id="busuanzi_value_site_uv" class="white-color"></span> 人.
+                </span>
+                
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/ZouMac/blog" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fa fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:tanzou34@gmail.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fa fa-envelope-open"></i>
+    </a>
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=593926211" class="tooltipped" data-tooltip="QQ联系我: 593926211" data-position="top" data-delay="50">
+        <i class="fa fa-qq"></i>
+    </a>
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+<!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fa fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字" class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+<!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fa fa-angle-up"></i>
+    </a>
+</div>
+
+
+<script src="/libs/materialize/materialize.min.js"></script>
+<script src="/libs/masonry/masonry.pkgd.min.js"></script>
+<script src="/libs/aos/aos.js"></script>
+<script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+<script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+<script src="/js/matery.js"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+
+    <script src="/libs/others/clicklove.js"></script>
+
+
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>

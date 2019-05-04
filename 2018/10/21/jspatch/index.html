@@ -1,0 +1,1151 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="JSPatch学习实践, null">
+    <meta name="description" content="JSPatch介绍JSPatch是一个开源的项目Github，只需要在项目里引入极小的引擎文件，就可以使用 JavaScript 调用任何 Objective-C 的原生接口，替换任意 Objective-C 原生方法。目前主要用于下发 J">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>JSPatch学习实践 | null</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+    <style type="text/css">
+        
+    </style>
+
+    <script src="/libs/jquery/jquery-2.2.0.min.js"></script>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+
+<header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span"></span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fa fa-navicon"></i></a>
+<ul class="right">
+    
+    <li class="hide-on-med-and-down">
+        <a href="/" class="waves-effect waves-light">
+            
+            <i class="fa fa-home"></i>
+            
+            <span>首页</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/tags" class="waves-effect waves-light">
+            
+            <i class="fa fa-tags"></i>
+            
+            <span>标签</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/categories" class="waves-effect waves-light">
+            
+            <i class="fa fa-bookmark"></i>
+            
+            <span>分类</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/archives" class="waves-effect waves-light">
+            
+            <i class="fa fa-archive"></i>
+            
+            <span>归档</span>
+        </a>
+    </li>
+    
+    <li class="hide-on-med-and-down">
+        <a href="/about" class="waves-effect waves-light">
+            
+            <i class="fa fa-user-circle-o"></i>
+            
+            <span>关于</span>
+        </a>
+    </li>
+    
+    <li>
+        <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+            <i id="searchIcon" class="fa fa-search" title="搜索"></i>
+        </a>
+    </li>
+</ul>
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name"></div>
+        <div class="logo-desc">
+            
+            Talk is cheap. Show me the code.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li>
+            <a href="/" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-home"></i>
+                
+                首页
+            </a>
+        </li>
+        
+        <li>
+            <a href="/tags" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-tags"></i>
+                
+                标签
+            </a>
+        </li>
+        
+        <li>
+            <a href="/categories" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-bookmark"></i>
+                
+                分类
+            </a>
+        </li>
+        
+        <li>
+            <a href="/archives" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-archive"></i>
+                
+                归档
+            </a>
+        </li>
+        
+        <li>
+            <a href="/about" class="waves-effect waves-light">
+                
+                <i class="fa fa-fw fa-user-circle-o"></i>
+                
+                关于
+            </a>
+        </li>
+        
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+    </nav>
+
+</header>
+
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/0.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <div class="description center-align post-title">
+                        JSPatch学习实践
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 20px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/JSPatch/" target="_blank">
+                                <span class="chip bg-color">JSPatch</span>
+                            </a>
+                        
+                            <a href="/tags/热修复/" target="_blank">
+                                <span class="chip bg-color">热修复</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fa fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/经验总结/" class="post-category" target="_blank">
+                                经验总结
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                <div class="post-date info-break-policy">
+                    <i class="fa fa-calendar-minus-o fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2018-10-21
+                </div>
+
+                
+                    
+                    <div class="info-break-policy">
+                        <i class="fa fa-file-word-o fa-fw"></i>文章字数:&nbsp;&nbsp;
+                        2.4k
+                    </div>
+                    
+
+                    
+                    <div class="info-break-policy">
+                        <i class="fa fa-clock-o fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                        11 分
+                    </div>
+                    
+                
+				
+				
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="fa fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h2 id="JSPatch介绍"><a href="#JSPatch介绍" class="headerlink" title="JSPatch介绍"></a>JSPatch介绍</h2><p>JSPatch是一个开源的项目<a href="https://github.com/bang590/JSPatch" target="_blank" rel="noopener">Github</a>，只需要在项目里引入极小的引擎文件，就可以使用 JavaScript 调用任何 Objective-C 的原生接口，替换任意 Objective-C 原生方法。目前主要用于下发 JS 脚本替换原生 Objective-C 代码，实时修复线上 bug。</p>
+<h3 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h3><ul>
+<li><p>类名 方法名 映射 相应的类和方法</p>
+<pre class=" language-objective-c"><code class="language-objective-c">//    生成类
+Class destinationClass = NSClassFromString(@"SecondViewController");
+id viewController = [[destinationClass alloc] init];
+//    生成方法
+SEL selector = NSSelectorFromString(@"changeBackgroundColor");
+[viewController performSelector:selector];
+
+[self.navigationController pushViewController:viewController animated:YES];
+</code></pre>
+</li>
+<li><p>为注册的新类添加方法</p>
+<pre class=" language-objective-c"><code class="language-objective-c">Class superCls = NSClassFromString(@"ViewController");
+Class cls = objc_allocateClassPair(superCls, "childViewController", 0);
+objc_registerClassPair(cls);
+
+SEL selector = NSSelectorFromString(@"setBlueBackground");
+class_addMethod(cls, selector, setBlueBackground, "v@:");
+
+id newVC = [[cls alloc] init];
+[self.navigationController pushViewController:newVC animated:YES];
+[newVC performSelector:@selector(setBlueBackground)];
+</code></pre>
+</li>
+<li><p>替换某个类的方法为新的实现</p>
+<pre class=" language-objective-c"><code class="language-objective-c">Class sourceClass = NSClassFromString(@"ViewController");
+id sourceControler = [[sourceClass alloc] init];
+
+SEL changeTitle = NSSelectorFromString(@"changeTitle");   
+class_replaceMethod(sourceClass, changeTitle, donotChangeTitle, "");    [sourceControler performSelector:changeTitle];
+</code></pre>
+<p>实现原理：JS传递字符串给OC，OC通过 Runtime 接口调用和替换OC方法。</p>
+</li>
+</ul>
+<h3 id="方法调用"><a href="#方法调用" class="headerlink" title="方法调用"></a>方法调用</h3><p>引入JSPatch后，可以通过以下代码创建一个UIView对象，并且设置背景颜色和透明度。涵盖了 require 引入类，JS 调用接口，消息传递，对象持有和转换，参数转换这五个方面。</p>
+<pre class=" language-js"><code class="language-js"><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UIView'</span><span class="token punctuation">)</span>
+<span class="token keyword">var</span> view <span class="token operator">=</span> UIView<span class="token punctuation">.</span><span class="token function">alloc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+view<span class="token punctuation">.</span><span class="token function">setBackgroundColor</span><span class="token punctuation">(</span><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UIColor'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">grayColor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+view<span class="token punctuation">.</span><span class="token function">setAlpha</span><span class="token punctuation">(</span><span class="token number">0.5</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="require"><a href="#require" class="headerlink" title="require"></a>require</h4><p>调用 <code>require(&#39;UIView&#39;)</code> 后，就可以直接使用 <code>UIView</code> 这个变量去调用相应的类方法了，require 做的事很简单，就是在JS全局作用域上创建一个同名变量，变量指向一个对象，对象属性 <code>__clsName</code> 保存类名，同时表明这个对象是一个 OC Class。</p>
+<pre class=" language-js"><code class="language-js"><span class="token keyword">var</span> _require <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>clsName<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>global<span class="token punctuation">[</span>clsName<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    global<span class="token punctuation">[</span>clsName<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+      __clsName<span class="token punctuation">:</span> clsName
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> global<span class="token punctuation">[</span>clsName<span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h4 id="JS调用接口"><a href="#JS调用接口" class="headerlink" title="JS调用接口"></a>JS调用接口</h4><p>a.<code>require(&#39;UIView&#39;)</code> 这句话在 JS 全局作用域生成了 <code>UIView</code> 这个对象，它有个属性叫 <code>__isCls</code>，表示这代表一个 OC 类。调用 <code>UIView</code> 这个对象的 <code>alloc()</code> 方法，会去到 <code>__c()</code>函数，在这个函数里判断到调用者 <code>__isCls</code> 属性，知道它是代表 OC 类，把方法名和类名传递给 OC 完成调用。实现类似OC/Lua/Ruby等的消息转发机制：</p>
+<pre class=" language-javascript"><code class="language-javascript">UIView<span class="token punctuation">.</span><span class="token function">alloc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token operator">-</span><span class="token operator">></span>
+UIView<span class="token punctuation">.</span><span class="token function">__c</span><span class="token punctuation">(</span><span class="token string">'alloc'</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">__c</span><span class="token punctuation">(</span><span class="token string">'init'</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<pre class=" language-javascript"><code class="language-javascript">Object<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>__c <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>methodName<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span>__obj <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span>__clsName<span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">[</span>methodName<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">var</span> self <span class="token operator">=</span> <span class="token keyword">this</span>
+  <span class="token keyword">return</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">var</span> args <span class="token operator">=</span> Array<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>slice<span class="token punctuation">.</span><span class="token function">call</span><span class="token punctuation">(</span>arguments<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token function">_methodFunc</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>__obj<span class="token punctuation">,</span> self<span class="token punctuation">.</span>__clsName<span class="token punctuation">,</span> methodName<span class="token punctuation">,</span> args<span class="token punctuation">,</span> self<span class="token punctuation">.</span>__isSuper<span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><code>_methodFunc()</code> 就是把相关信息传给OC，OC用 Runtime 接口调用相应方法，返回结果值，这个调用就结束了。</p>
+<p>b.对于一个自定义id对象，JavaScriptCore 会把这个自定义对象的指针传给 JS，这个对象在 JS 无法使用，但在回传给 OC 时 OC 可以找到这个对象。对于这个对象生命周期的管理，如果JS有变量引用时，这个 OC 对象引用计数就加1 ，JS 变量的引用释放了就减1，如果 OC 上没别的持有者，这个OC对象的生命周期就跟着 JS 走了，会在 JS 进行垃圾回收时释放。</p>
+<h4 id="消息传递"><a href="#消息传递" class="headerlink" title="消息传递"></a>消息传递</h4><p>消息传递使用了JavaScriptCore 的接口，OC端在启动JSPatch引擎时会创建一个 JSContext 实例，JSContext 是JS代码的执行环境，可以给 JSContext 添加方法，JS就可以直接调用这个方法。JS通过调用 JSContext 定义的方法把数据传给OC，OC通过返回值传会给JS：</p>
+<pre class=" language-javascript"><code class="language-javascript">JSContext <span class="token operator">*</span>context <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">[</span>JSContext alloc<span class="token punctuation">]</span> init<span class="token punctuation">]</span><span class="token punctuation">;</span>
+context<span class="token punctuation">[</span>@<span class="token string">"hello"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token operator">^</span><span class="token punctuation">(</span>NSString <span class="token operator">*</span>msg<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">NSLog</span><span class="token punctuation">(</span>@<span class="token string">"hello %@"</span><span class="token punctuation">,</span> msg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">[</span>_context evaluateScript<span class="token punctuation">:</span>@<span class="token string">"hello('word')"</span><span class="token punctuation">]</span><span class="token punctuation">;</span>   
+</code></pre>
+<h4 id="方法替换"><a href="#方法替换" class="headerlink" title="方法替换"></a>方法替换</h4><p>让<code>ORIGViewDidLoad</code>指向<code>viewDidLoad</code>,<code>viewDidLoad</code>指向新的实现<code>viewDidLoadIMP</code>。</p>
+<pre class=" language-objective-c"><code class="language-objective-c">static void viewDidLoadIMP (id slf, SEL sel) {
+   JSValue *jsFunction = …;
+   [jsFunction callWithArguments:nil];
+}
+
+Class cls = NSClassFromString(@"UIViewController");
+SEL selector = @selector(viewDidLoad);
+Method method = class_getInstanceMethod(cls, selector);
+
+//获得viewDidLoad方法的函数指针
+IMP imp = method_getImplementation(method)
+
+//获得viewDidLoad方法的参数类型
+char *typeDescription = (char *)method_getTypeEncoding(method);
+
+//新增一个ORIGViewDidLoad方法，指向原来的viewDidLoad实现
+class_addMethod(cls, @selector(ORIGViewDidLoad), imp, typeDescription);
+
+//把viewDidLoad IMP指向自定义新的实现
+class_replaceMethod(cls, selector, viewDidLoadIMP, typeDescription);
+</code></pre>
+<p>替换 UIViewController 的 -viewWillAppear: 方法为例：</p>
+<ol>
+<li><p>把UIViewController的 <code>-viewWillAppear:</code> 方法通过 <code>class_replaceMethod()</code> 接口指向 <code>_objc_msgForward</code>，这是一个全局 IMP，OC 调用方法不存在时都会转发到这个 IMP 上，这里直接把方法替换成这个 IMP，这样调用这个方法时就会走到 <code>-forwardInvocation:</code>。</p>
+</li>
+<li><p>为UIViewController添加 <code>-ORIGviewWillAppear:</code> 和 <code>-_JPviewWillAppear:</code> 两个方法，前者指向原来的IMP实现，后者是新的实现，稍后会在这个实现里回调JS函数。</p>
+</li>
+<li><p>改写UIViewController的 <code>-forwardInvocation:</code> 方法为自定义实现。一旦OC里调用 UIViewController 的 <code>-viewWillAppear:</code> 方法，经过上面的处理会把这个调用转发到 <code>-forwardInvocation:</code> ，这时已经组装好了一个 NSInvocation，包含了这个调用的参数。在这里把参数从 NSInvocation 反解出来，带着参数调用上述新增加的方法 <code>-_JPviewWillAppear:</code>，在这个新方法里取到参数传给JS，调用JS的实现函数。整个调用过程就结束了，整个过程图示如下：</p>
+<p><img src="https://camo.githubusercontent.com/48cbbd8ee1c8af0ef8f18a2e0ab0d50a085afab1/687474703a2f2f626c6f672e636e62616e672e6e65742f77702d636f6e74656e742f75706c6f6164732f323031352f30362f4a535061746368322e706e67" alt="JSPatch方法替换"></p>
+<p>​</p>
+</li>
+</ol>
+<h2 id="JSPatch使用"><a href="#JSPatch使用" class="headerlink" title="JSPatch使用"></a>JSPatch使用</h2><h3 id="OC与JSPatch代码转换"><a href="#OC与JSPatch代码转换" class="headerlink" title="OC与JSPatch代码转换"></a>OC与JSPatch代码转换</h3><pre class=" language-objective-c"><code class="language-objective-c">//OC
+@interface CompareJSPatchController : UITableViewController
+@end
+
+@interface CompareJSPatchController()<uialertviewdelegate>
+
+@end
+
+@implementation CompareJSPatchController
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return [self dataSource].count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
+    }
+    cell.textLabel.text = [self dataSource][indexPath.row];
+    return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 60;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Alert" message:[self dataSource][indexPath.row] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alertView show];
+}
+
+- (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex {
+
+    NSLog(@"click btn %@",[alertView buttonTitleAtIndex:buttonIndex]);
+}
+
+
+- (NSArray *)dataSource {
+
+    if (_data == nil) {
+        _data = [NSMutableArray array];
+        for (int i = 0; i < 20; i++) {
+            [_data addObject:[NSString stringWithFormat:@"cell from js %d",i]];
+        }
+    }
+    return _data;
+}
+
+@end
+</uialertviewdelegate></code></pre>
+<pre class=" language-js"><code class="language-js"><span class="token comment" spellcheck="true">//JSPatch</span>
+<span class="token function">defineClass</span><span class="token punctuation">(</span><span class="token string">'CompareJSPatchController : UITableViewController &lt;UIAlertViewDelegate>'</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+
+    dataSource<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> data <span class="token operator">=</span> self<span class="token punctuation">.</span><span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token keyword">return</span> data<span class="token punctuation">;</span>
+    <span class="token keyword">var</span> data <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">var</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">20</span><span class="token punctuation">;</span> i <span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    data<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token string">"cell from js "</span> <span class="token operator">+</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    self<span class="token punctuation">.</span><span class="token function">setData</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> data<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+
+    numberOfSectionsInTableView<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>tableView<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+
+    tableView_numberOfRowsInSection<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>tableView<span class="token punctuation">,</span> section<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> self<span class="token punctuation">.</span><span class="token function">dataSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>length<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+
+    tableView_cellForRowAtIndexPath<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>tableView<span class="token punctuation">,</span> indexPath<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> cell <span class="token operator">=</span> tableView<span class="token punctuation">.</span><span class="token function">dequeueReusableCellWithIdentifier</span><span class="token punctuation">(</span><span class="token string">"cell"</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>cell<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    cell <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UITableViewCell'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">alloc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">initWithStyle_reuseIdentifier</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">"cell"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    cell<span class="token punctuation">.</span><span class="token function">textLabel</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setText</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span><span class="token function">dataSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span>indexPath<span class="token punctuation">.</span><span class="token function">row</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> cell
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+
+    tableView_heightForRowAtIndexPath<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>tableView<span class="token punctuation">,</span> indexPath<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token number">60</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+
+    tableView_didSelectRowAtIndexPath<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>tableView<span class="token punctuation">,</span> indexPath<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> alertView <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UIAlertView'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">alloc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">initWithTitle_message_delegate_cancelButtonTitle_otherButtonTitles</span><span class="token punctuation">(</span><span class="token string">"Alert"</span><span class="token punctuation">,</span>self<span class="token punctuation">.</span><span class="token function">dataSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span>indexPath<span class="token punctuation">.</span><span class="token function">row</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span> self<span class="token punctuation">,</span> <span class="token string">"OK"</span><span class="token punctuation">,</span>  <span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    alertView<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+
+    alertView_willDismissWithButtonIndex<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>alertView<span class="token punctuation">,</span> idx<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'click btn '</span> <span class="token operator">+</span> alertView<span class="token punctuation">.</span><span class="token function">buttonTitleAtIndex</span><span class="token punctuation">(</span>idx<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toJS</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="defineClass"><a href="#defineClass" class="headerlink" title="defineClass"></a>defineClass</h4><p><code>defineClass(classDeclaration, [properties] instanceMethods, classMethods)</code></p>
+<p>@param <code>classDeclaration</code>: 字符串，<code>className:superClassName &lt;Protocol&gt;</code></p>
+<p>@param <code>properties</code>: 新增property，字符串数组，可省略 </p>
+<p>@param <code>instanceMethods</code>: 要添加或覆盖的实例方法 </p>
+<p>@param <code>classMethods</code>: 要添加或覆盖的类方法</p>
+<pre class=" language-js"><code class="language-js"><span class="token function">defineClass</span><span class="token punctuation">(</span><span class="token string">"类名"</span><span class="token punctuation">,</span><span class="token punctuation">[</span><span class="token string">"成员变量"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//实例方法,不同方法之间使用逗号分隔</span>
+    viewDidLoad<span class="token punctuation">:</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//do something</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token operator">...</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//类方法,不同方法之间使用逗号分隔</span>
+    getClassName<span class="token punctuation">:</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token operator">...</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="ORIG使用原方法"><a href="#ORIG使用原方法" class="headerlink" title="ORIG使用原方法"></a>ORIG使用原方法</h4><pre class=" language-javascript"><code class="language-javascript"><span class="token function">defineClass</span><span class="token punctuation">(</span><span class="token string">"类名"</span><span class="token punctuation">,</span><span class="token punctuation">[</span><span class="token string">"成员变量"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//覆盖原方法</span>
+    viewDidLoad<span class="token punctuation">:</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//do something</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token comment" spellcheck="true">//使用原方法</span>
+    ORGIviewDidLoad<span class="token punctuation">:</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//do something</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token operator">...</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="导入头文件"><a href="#导入头文件" class="headerlink" title="导入头文件"></a>导入头文件</h4><p><code>require(&#39;UIColor,UIView,NSURL,NSURLRequest,UIFont,UILabel&#39;);</code></p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UIView'</span><span class="token punctuation">)</span>
+<span class="token keyword">var</span> view <span class="token operator">=</span> UIView<span class="token punctuation">.</span><span class="token function">alloc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+view<span class="token punctuation">.</span><span class="token function">setBackgroundColor</span><span class="token punctuation">(</span><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UIColor'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">grayColor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+view<span class="token punctuation">.</span><span class="token function">setAlpha</span><span class="token punctuation">(</span><span class="token number">0.5</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="Protocol"><a href="#Protocol" class="headerlink" title="Protocol"></a>Protocol</h4><pre class=" language-javascript"><code class="language-javascript"><span class="token comment" spellcheck="true">//JSPatch</span>
+<span class="token function">defineClass</span><span class="token punctuation">(</span><span class="token string">"JPViewController: UIViewController &lt;UIAlertViewDelegate>"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  viewDidAppear<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>animated<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> alertView <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UIAlertView'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">alloc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">initWithTitle_message_delegate_cancelButtonTitle_otherButtonTitles</span><span class="token punctuation">(</span><span class="token string">"Alert"</span><span class="token punctuation">,</span> self<span class="token punctuation">.</span><span class="token function">dataSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">objectAtIndex</span><span class="token punctuation">(</span>indexPath<span class="token punctuation">.</span><span class="token function">row</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> self<span class="token punctuation">,</span> <span class="token string">"OK"</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+     alertView<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+  alertView_clickedButtonAtIndex<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>alertView<span class="token punctuation">,</span> buttonIndex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'clicked index '</span> <span class="token operator">+</span> buttonIndex<span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="动态新增-Property"><a href="#动态新增-Property" class="headerlink" title="动态新增 Property"></a>动态新增 Property</h4><pre class=" language-js"><code class="language-js"><span class="token function">defineClass</span><span class="token punctuation">(</span><span class="token string">"JPTableViewController"</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">,</span> <span class="token string">'totalCount'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  init<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     self <span class="token operator">=</span> self<span class="token punctuation">.</span><span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+     self<span class="token punctuation">.</span><span class="token function">setData</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">"a"</span><span class="token punctuation">,</span> <span class="token string">"b"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>     <span class="token comment" spellcheck="true">//添加新的 Property (id data)</span>
+     self<span class="token punctuation">.</span><span class="token function">setTotalCount</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span>
+     <span class="token keyword">return</span> self
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  viewDidLoad<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     <span class="token keyword">var</span> data <span class="token operator">=</span> self<span class="token punctuation">.</span><span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span>     <span class="token comment" spellcheck="true">//获取 Property 值</span>
+     <span class="token keyword">var</span> totalCount <span class="token operator">=</span> self<span class="token punctuation">.</span><span class="token function">totalCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="结构体"><a href="#结构体" class="headerlink" title="结构体"></a>结构体</h4><p><code>JSPatch</code>原生支持 <code>CGRect / CGPoint / CGSize / NSRange</code> 这四个 <code>struct</code> 类型，用 <code>JS</code> 对象表示:</p>
+<pre class=" language-objective-c"><code class="language-objective-c">CGRectMake(20, 20, 100, 100)                      //OC
+{x:20, y:20, width:100, height:100}               //JSPatch
+
+CGPointMake(10,10)                                //OC
+{x: 10, y: 10}                                    //JSPatch
+
+CGSizeMake(100, 100)                              //OC
+{width: 100, height:100}                          //JSPatch
+
+NSMakeRange(0, 1)                                 //OC
+{location: 0, length: 1}                          //JSPatch
+</code></pre>
+<ul>
+<li><p>若要让 JS 脚本支持其他 struct 类型，需要先手动注册<a href="https://github.com/bang590/JSPatch/wiki/添加-struct-类型支持" target="_blank" rel="noopener">添加 struct 类型支持</a></p>
+<pre><code>//支持 CGAffineTransform
+require(&#39;JPEngine&#39;).defineStruct({
+  &quot;name&quot;: &quot;CGAffineTransform&quot;,
+  &quot;types&quot;: &quot;FFFFFF&quot;,
+  &quot;keys&quot;: [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;tx&quot;, &quot;ty&quot;]
+})
+</code></pre></li>
+</ul>
+<h4 id="Selector"><a href="#Selector" class="headerlink" title="Selector"></a>Selector</h4><p>在JS使用字符串代表 <code>Selector</code>（需要使用“ ”包裹字符串）:</p>
+<pre class=" language-objective-c"><code class="language-objective-c">//Obj-C
+[self performSelector:@selector(viewWillAppear:) withObject:@(YES)];
+
+//JS
+self.performSelector_withObject("viewWillAppear:", 1)
+</code></pre>
+<h4 id="打印"><a href="#打印" class="headerlink" title="打印"></a>打印</h4><p><code>console.log()</code></p>
+<h4 id="nil"><a href="#nil" class="headerlink" title="nil"></a>nil</h4><p>JS 上的 <code>null</code> 和 <code>undefined</code> 都代表 OC 的 <code>nil</code>，如果要表示 <code>NSNull</code>, 用 <code>nsnull</code> 代替，如果要表示 <code>NULL</code>, 也用 <code>null</code> 代替</p>
+<h4 id="NSArray-NSString-NSDictionary"><a href="#NSArray-NSString-NSDictionary" class="headerlink" title="NSArray / NSString / NSDictionary"></a>NSArray / NSString / NSDictionary</h4><p><code>NSArray / NSString / NSDictionary</code> 不会自动转成对应的 JS 类型，像普通 <code>NSObject</code> 一样使用它们</p>
+<pre class=" language-objective-c"><code class="language-objective-c">//在OC中创建的数组和字典
+@implementation JPObject
++ (NSArray *)data {
+  return @[[NSMutableString stringWithString:@"JS"]]
+}
++ (NSMutableDictionary *)dict {
+    return [[NSMutableDictionary alloc] init];
+}
+@end
+</code></pre>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token comment" spellcheck="true">//在JSPatch中获取与使用</span>
+<span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'JPObject'</span><span class="token punctuation">)</span>
+<span class="token keyword">var</span> ocStr <span class="token operator">=</span> JPObject<span class="token punctuation">.</span><span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">objectAtIndex</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+ocStr<span class="token punctuation">.</span><span class="token function">appendString</span><span class="token punctuation">(</span><span class="token string">"Patch"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">var</span> dict <span class="token operator">=</span> JPObject<span class="token punctuation">.</span><span class="token function">dict</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+dict<span class="token punctuation">.</span><span class="token function">setObject_forKey</span><span class="token punctuation">(</span>ocStr<span class="token punctuation">,</span> <span class="token string">'name'</span><span class="token punctuation">)</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>dict<span class="token punctuation">.</span><span class="token function">objectForKey</span><span class="token punctuation">(</span><span class="token string">'name'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="weak-strong"><a href="#weak-strong" class="headerlink" title="weak / strong"></a>weak / strong</h4><pre class=" language-js"><code class="language-js"><span class="token keyword">var</span> weakSelf <span class="token operator">=</span> <span class="token function">__weak</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span>
+self<span class="token punctuation">.</span><span class="token function">setCompleteBlock</span><span class="token punctuation">(</span><span class="token function">block</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token operator">...</span>
+    <span class="token keyword">var</span> strongSelf <span class="token operator">=</span> <span class="token function">__strong</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span>
+    <span class="token operator">...</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="Block"><a href="#Block" class="headerlink" title="Block"></a>Block</h4><ul>
+<li><p>block传值</p>
+<p>将JS函数作为block传递给OC</p>
+<p>需要使用<code>block(paramTypes, function)</code>接口包装</p>
+<pre class=" language-objective-c"><code class="language-objective-c">+ (void)request:(void(^)(NSString *content, BOOL success))callback {
+    callback(@"I'm content", YES);
+}
+</code></pre>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'JPEngine'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">addExtensions</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'JPBlock'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//接入JPBlock扩展，使用完整的block</span>
+<span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'ViewController'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">request</span><span class="token punctuation">(</span><span class="token function">block</span><span class="token punctuation">(</span><span class="token string">"void, NSString *, BOOL"</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>ctn<span class="token punctuation">,</span> succ<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>succ<span class="token punctuation">)</span> <span class="token function">log</span><span class="token punctuation">(</span>ctn<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true">//output: I'm content</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>将OC中的block传递给JSPatch</p>
+<pre class=" language-objective-c"><code class="language-objective-c">typedef void(^JPBlock)(NSDictionary *dict);
++ (JPBlock)getBlock {
+    NSString *ctn = @"JSPatch";
+    JPBlock block = ^(NSDictionary *dict) {
+        NSLog(@"I'm %@, version: %@", ctn, dict[@"version"]);
+    };
+    return block;
+}
+</code></pre>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">var</span> block <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'ViewController'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getBlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">block</span><span class="token punctuation">(</span><span class="token punctuation">{</span>version<span class="token punctuation">:</span><span class="token string">'1.0.0'</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>总结：JS 没有 block 类型的变量，OC 的 block 对象传到 JS 会变成 JS function，所有要从 JS 传 block 给 OC 都需要用 <code>block()</code> 接口包装。</p>
+</li>
+<li><p><a href="https://github.com/bang590/JSPatch/wiki/JPBlock-扩展使用文档" target="_blank" rel="noopener">JPBlock扩展</a></p>
+</li>
+</ul>
+<h4 id="GCD"><a href="#GCD" class="headerlink" title="GCD"></a>GCD</h4><p>使用 <code>dispatch_after() dispatch_async_main()</code> <code>dispatch_sync_main() dispatch_async_global_queue()</code> 接口调用GCD方法:</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token function">dispatch_after</span><span class="token punctuation">(</span><span class="token number">1.0</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// do something</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token function">dispatch_async_main</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// do something</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token function">dispatch_sync_main</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// do something</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token function">dispatch_async_global_queue</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// do something</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="枚举、宏、全局变量"><a href="#枚举、宏、全局变量" class="headerlink" title="枚举、宏、全局变量"></a>枚举、宏、全局变量</h4><ul>
+<li><p>OC中的枚举 要直接换成 具体值替换 <code>UIControlEventTouchUpInside</code> =&gt; <code>1&lt;&lt;6</code></p>
+<pre class=" language-objective-c"><code class="language-objective-c">[btn addTarget:self action:@selector(handleBtn) forControlEvents:UIControlEventTouchUpInside];
+</code></pre>
+<pre class=" language-js"><code class="language-js">btn<span class="token punctuation">.</span><span class="token function">addTarget_action_forControlEvents</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> <span class="token string">"handleBtn"</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token operator">&lt;</span><span class="token operator">&lt;</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+</li>
+<li><p>宏</p>
+<p>Objective-C 里的宏不能直接在 JS 上使用，可以使用全局变量替代</p>
+</li>
+<li><p>全局变量</p>
+<p>在类里定义的 <code>static</code> 全局变量无法在 JS 上获取到，若要在 JS 拿到这个变量，需要在 OC 用get方法返回：</p>
+<pre class=" language-objective-c"><code class="language-objective-c">static NSString *name;
+@implementation JPTestObject
++ (NSString *)name {
+  return name;
+}
+@end
+</code></pre>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">var</span> name <span class="token operator">=</span> JPTestObject<span class="token punctuation">.</span><span class="token function">name</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">//拿到全局变量值</span>
+</code></pre>
+</li>
+</ul>
+<h3 id="JSPatch-代码转换器"><a href="#JSPatch-代码转换器" class="headerlink" title="JSPatch 代码转换器"></a><a href="https://jspatch.com/Tools/convertor" target="_blank" rel="noopener">JSPatch 代码转换器</a></h3><h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><h5 id="在-iOS8-下，JSPatch-支持使用-Safari-自带的调试工具对-JS-脚本进行断点调试"><a href="#在-iOS8-下，JSPatch-支持使用-Safari-自带的调试工具对-JS-脚本进行断点调试" class="headerlink" title="在 iOS8 下，JSPatch 支持使用 Safari 自带的调试工具对 JS 脚本进行断点调试"></a>在 iOS8 下，JSPatch 支持使用 Safari 自带的调试工具对 JS 脚本进行断点调试</h5><ul>
+<li>开启 Safari 调试菜单：Safari -&gt; 偏好设置 -&gt; 高级 -&gt; 勾选[在菜单栏中显示“开发”菜单]</li>
+<li>启动APP -&gt; Safari -&gt; 开发 -&gt; 选择你的机器 -&gt; JSContext</li>
+<li>连接真机调试时，需要打开真机的web检查器：设置 -&gt; Safari -&gt; 高级 -&gt; Web检查器</li>
+</ul>
+<p><img src="/2018/10/21/jspatch/JSContext.png" alt="JSContext"></p>
+<h2 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h2><p><a href>JSPatchDemo</a></p>
+
+            </div>
+            <hr>
+
+            
+
+            <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+
+<div id="article-share">
+    
+    <div class="social-share" data-disabled="qzone" data-wechat-qrcode-helper="<p>微信里点“发现”->“扫一扫”二维码便可查看分享。</p>"></div>
+    
+</div>
+
+<script src="/libs/share/js/social-share.min.js"></script>
+
+            <div class="reprint">
+                <p>
+                    <span class="reprint-tip">
+                        <i class="fa fa-exclamation-circle"></i>&nbsp;&nbsp;转载请注明:
+                    </span>
+                    <a href="http://yoursite.com" class="b-link-green"></a>
+                    <i class="fa fa-angle-right fa-lg fa-fw text-color"></i>
+                    <a href="/2018/10/21/jspatch/" class="b-link-green">JSPatch学习实践</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    
+
+    
+
+    
+        <div class="disqus-card card" data-aos="fade-up">
+    <div id="disqus_thread" class="card-content">
+        <noscript>Please enable JavaScript to view the
+            <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+    </div>
+</div>
+
+<script type="text/javascript">
+    disqus_config = function () {
+        this.page.url = 'http://yoursite.com/2018/10/21/jspatch/';
+        this.page.identifier = '/2018/10/21/jspatch/';
+        this.page.title = 'JSPatch学习实践';
+    };
+    let disqus_shortname = 'tanzou';
+
+    (function () { // DON'T EDIT BELOW THIS LINE
+        let d = document, s = d.createElement('script');
+        // 如：s.src = 'https://blinkfox.disqus.com/embed.js';
+        s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6 overflow-policy" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2019/02/21/slam/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="slam 约球微信小程序开发文档">
+                        
+                        <span class="card-title">slam 约球微信小程序开发文档</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            项目说明slam约球是一款为篮球爱好者提供的篮球约战平台，用户可以创建球员档案、篮球场以及管理联盟，让周围的球友更加了解你，方便篮球爱好者相互交流。
+模块球员档案模块球员档案模块主要用于展示球员的个体信息、以及球员属性、投篮热图等信息。用户
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2019-02-21
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/设计文档/" class="post-category" target="_blank">
+                                    设计文档
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/微信小程序/" target="_blank">
+                        <span class="chip bg-color">微信小程序</span>
+                    </a>
+                    
+                    <a href="/tags/project/" target="_blank">
+                        <span class="chip bg-color">project</span>
+                    </a>
+                    
+                    <a href="/tags/UML/" target="_blank">
+                        <span class="chip bg-color">UML</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6 overflow-policy" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fa fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2018/08/22/ios-fbkvocontroller/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="FBKVOController源码分析">
+                        
+                        <span class="card-title">FBKVOController源码分析</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            前言FBKVOController 是 Facebook 开源的接口设计优雅的 KVO 框架。研读源码有助于加深对其框架和模式的理解，将其中的一些代码技巧运用到开发工作中，以提升自身开发水平。
+ 
+一、FBKVOController 简介K
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2018-08-22
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/源码学习/" class="post-category" target="_blank">
+                                    源码学习
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/KVO/" target="_blank">
+                        <span class="chip bg-color">KVO</span>
+                    </a>
+                    
+                    <a href="/tags/源码分析/" target="_blank">
+                        <span class="chip bg-color">源码分析</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+</div>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="fa fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fa fa-list"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            // headingsOffset: -205,
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).slideUp(500);
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).slideDown(500);
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+    
+
+</main>
+
+
+<footer class="page-footer bg-color">
+    <div class="container row center-align">
+        <div class="col s12 m8 l8 copy-right">
+            本站由&copy;<a href="https://blinkfox.github.io/" target="_blank">Blinkfox</a>基于
+            <a href="https://hexo.io/" target="_blank">Hexo</a> 的
+            <a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">hexo-theme-matery</a>主题搭建.
+
+            
+                &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;
+                <span class="white-color">15.9k</span>
+            
+
+            
+			
+                <br>
+                
+                <span id="busuanzi_container_site_pv">
+                    <i class="fa fa-heart-o"></i>
+                    本站总访问量 <span id="busuanzi_value_site_pv" class="white-color"></span>
+                </span>
+                
+                
+                <span id="busuanzi_container_site_uv">
+                    <i class="fa fa-users"></i>
+                    次,&nbsp;访客数 <span id="busuanzi_value_site_uv" class="white-color"></span> 人.
+                </span>
+                
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/ZouMac/blog" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fa fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:tanzou34@gmail.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fa fa-envelope-open"></i>
+    </a>
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=593926211" class="tooltipped" data-tooltip="QQ联系我: 593926211" data-position="top" data-delay="50">
+        <i class="fa fa-qq"></i>
+    </a>
+
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+<!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fa fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字" class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/" + "search.xml", 'searchInput', 'searchResult');
+});
+</script>
+<!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fa fa-angle-up"></i>
+    </a>
+</div>
+
+
+<script src="/libs/materialize/materialize.min.js"></script>
+<script src="/libs/masonry/masonry.pkgd.min.js"></script>
+<script src="/libs/aos/aos.js"></script>
+<script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+<script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+<script src="/js/matery.js"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+
+    <script src="/libs/others/clicklove.js"></script>
+
+
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
