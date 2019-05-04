@@ -110,7 +110,7 @@
         <div class="logo-name"></div>
         <div class="logo-desc">
             
-            Talk is cheap.Show me the code.
+            Talk is cheap. Show me the code.
             
         </div>
     </div>
@@ -391,14 +391,14 @@
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>Word Count:&nbsp;&nbsp;
-                        2.6k
+                        2.4k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>Read Times:&nbsp;&nbsp;
-                        12 Min
+                        11 Min
                     </div>
                     
                 
@@ -417,33 +417,100 @@
                 <h2 id="JSPatch介绍"><a href="#JSPatch介绍" class="headerlink" title="JSPatch介绍"></a>JSPatch介绍</h2><p>JSPatch是一个开源的项目<a href="https://github.com/bang590/JSPatch" target="_blank" rel="noopener">Github</a>，只需要在项目里引入极小的引擎文件，就可以使用 JavaScript 调用任何 Objective-C 的原生接口，替换任意 Objective-C 原生方法。目前主要用于下发 JS 脚本替换原生 Objective-C 代码，实时修复线上 bug。</p>
 <h3 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h3><ul>
 <li><p>类名 方法名 映射 相应的类和方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">//    生成类</span><br><span class="line">Class destinationClass = NSClassFromString(@&quot;SecondViewController&quot;);</span><br><span class="line">id viewController = [[destinationClass alloc] init];</span><br><span class="line">//    生成方法</span><br><span class="line">SEL selector = NSSelectorFromString(@&quot;changeBackgroundColor&quot;);</span><br><span class="line">[viewController performSelector:selector];</span><br><span class="line">    </span><br><span class="line">[self.navigationController pushViewController:viewController animated:YES];</span><br></pre></td></tr></table></figure>
+<pre class=" language-objective-c"><code class="language-objective-c">//    生成类
+Class destinationClass = NSClassFromString(@"SecondViewController");
+id viewController = [[destinationClass alloc] init];
+//    生成方法
+SEL selector = NSSelectorFromString(@"changeBackgroundColor");
+[viewController performSelector:selector];
+
+[self.navigationController pushViewController:viewController animated:YES];
+</code></pre>
 </li>
 <li><p>为注册的新类添加方法</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Class superCls = NSClassFromString(@&quot;ViewController&quot;);</span><br><span class="line">Class cls = objc_allocateClassPair(superCls, &quot;childViewController&quot;, 0);</span><br><span class="line">objc_registerClassPair(cls);</span><br><span class="line"></span><br><span class="line">SEL selector = NSSelectorFromString(@&quot;setBlueBackground&quot;);</span><br><span class="line">class_addMethod(cls, selector, setBlueBackground, &quot;v@:&quot;);</span><br><span class="line"></span><br><span class="line">id newVC = [[cls alloc] init];</span><br><span class="line">[self.navigationController pushViewController:newVC animated:YES];</span><br><span class="line">[newVC performSelector:@selector(setBlueBackground)];</span><br></pre></td></tr></table></figure>
+<pre class=" language-objective-c"><code class="language-objective-c">Class superCls = NSClassFromString(@"ViewController");
+Class cls = objc_allocateClassPair(superCls, "childViewController", 0);
+objc_registerClassPair(cls);
+
+SEL selector = NSSelectorFromString(@"setBlueBackground");
+class_addMethod(cls, selector, setBlueBackground, "v@:");
+
+id newVC = [[cls alloc] init];
+[self.navigationController pushViewController:newVC animated:YES];
+[newVC performSelector:@selector(setBlueBackground)];
+</code></pre>
 </li>
 <li><p>替换某个类的方法为新的实现</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Class sourceClass = NSClassFromString(@&quot;ViewController&quot;);</span><br><span class="line">id sourceControler = [[sourceClass alloc] init];</span><br><span class="line"> </span><br><span class="line">SEL changeTitle = NSSelectorFromString(@&quot;changeTitle&quot;);   </span><br><span class="line">class_replaceMethod(sourceClass, changeTitle, donotChangeTitle, &quot;&quot;);    [sourceControler performSelector:changeTitle];</span><br></pre></td></tr></table></figure>
+<pre class=" language-objective-c"><code class="language-objective-c">Class sourceClass = NSClassFromString(@"ViewController");
+id sourceControler = [[sourceClass alloc] init];
+
+SEL changeTitle = NSSelectorFromString(@"changeTitle");   
+class_replaceMethod(sourceClass, changeTitle, donotChangeTitle, "");    [sourceControler performSelector:changeTitle];
+</code></pre>
 <p>实现原理：JS传递字符串给OC，OC通过 Runtime 接口调用和替换OC方法。</p>
 </li>
 </ul>
-<p>###方法调用</p>
-<p>引入JSPatch后，可以通过以下代码创建一个UIView对象，并且设置背景颜色和透明度。涵盖了 require 引入类，JS 调用接口，消息传递，对象持有和转换，参数转换这五个方面。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">'UIView'</span>)</span><br><span class="line"><span class="keyword">var</span> view = UIView.alloc().init()</span><br><span class="line">view.setBackgroundColor(<span class="built_in">require</span>(<span class="string">'UIColor'</span>).grayColor())</span><br><span class="line">view.setAlpha(<span class="number">0.5</span>)</span><br></pre></td></tr></table></figure>
-<p>####require</p>
-<p>调用 <code>require(&#39;UIView&#39;)</code> 后，就可以直接使用 <code>UIView</code> 这个变量去调用相应的类方法了，require 做的事很简单，就是在JS全局作用域上创建一个同名变量，变量指向一个对象，对象属性 <code>__clsName</code> 保存类名，同时表明这个对象是一个 OC Class。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> _require = <span class="function"><span class="keyword">function</span>(<span class="params">clsName</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!global[clsName]) &#123;</span><br><span class="line">    global[clsName] = &#123;</span><br><span class="line">      __clsName: clsName</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> global[clsName]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>####JS调用接口</p>
-<p>a.<code>require(&#39;UIView&#39;)</code> 这句话在 JS 全局作用域生成了 <code>UIView</code> 这个对象，它有个属性叫 <code>__isCls</code>，表示这代表一个 OC 类。调用 <code>UIView</code> 这个对象的 <code>alloc()</code> 方法，会去到 <code>__c()</code>函数，在这个函数里判断到调用者 <code>__isCls</code> 属性，知道它是代表 OC 类，把方法名和类名传递给 OC 完成调用。实现类似OC/Lua/Ruby等的消息转发机制：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">UIView.alloc().init()</span><br><span class="line">-&gt;</span><br><span class="line">UIView.__c(<span class="string">'alloc'</span>)().__c(<span class="string">'init'</span>)()</span><br></pre></td></tr></table></figure>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Object</span>.prototype.__c = <span class="function"><span class="keyword">function</span>(<span class="params">methodName</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!<span class="keyword">this</span>.__obj &amp;&amp; !<span class="keyword">this</span>.__clsName) <span class="keyword">return</span> <span class="keyword">this</span>[methodName].bind(<span class="keyword">this</span>);</span><br><span class="line">  <span class="keyword">var</span> self = <span class="keyword">this</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> args = <span class="built_in">Array</span>.prototype.slice.call(<span class="built_in">arguments</span>)</span><br><span class="line">    <span class="keyword">return</span> _methodFunc(self.__obj, self.__clsName, methodName, args, self.__isSuper)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="方法调用"><a href="#方法调用" class="headerlink" title="方法调用"></a>方法调用</h3><p>引入JSPatch后，可以通过以下代码创建一个UIView对象，并且设置背景颜色和透明度。涵盖了 require 引入类，JS 调用接口，消息传递，对象持有和转换，参数转换这五个方面。</p>
+<pre class=" language-js"><code class="language-js"><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UIView'</span><span class="token punctuation">)</span>
+<span class="token keyword">var</span> view <span class="token operator">=</span> UIView<span class="token punctuation">.</span><span class="token function">alloc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+view<span class="token punctuation">.</span><span class="token function">setBackgroundColor</span><span class="token punctuation">(</span><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UIColor'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">grayColor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+view<span class="token punctuation">.</span><span class="token function">setAlpha</span><span class="token punctuation">(</span><span class="token number">0.5</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="require"><a href="#require" class="headerlink" title="require"></a>require</h4><p>调用 <code>require(&#39;UIView&#39;)</code> 后，就可以直接使用 <code>UIView</code> 这个变量去调用相应的类方法了，require 做的事很简单，就是在JS全局作用域上创建一个同名变量，变量指向一个对象，对象属性 <code>__clsName</code> 保存类名，同时表明这个对象是一个 OC Class。</p>
+<pre class=" language-js"><code class="language-js"><span class="token keyword">var</span> _require <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>clsName<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>global<span class="token punctuation">[</span>clsName<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    global<span class="token punctuation">[</span>clsName<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+      __clsName<span class="token punctuation">:</span> clsName
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> global<span class="token punctuation">[</span>clsName<span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h4 id="JS调用接口"><a href="#JS调用接口" class="headerlink" title="JS调用接口"></a>JS调用接口</h4><p>a.<code>require(&#39;UIView&#39;)</code> 这句话在 JS 全局作用域生成了 <code>UIView</code> 这个对象，它有个属性叫 <code>__isCls</code>，表示这代表一个 OC 类。调用 <code>UIView</code> 这个对象的 <code>alloc()</code> 方法，会去到 <code>__c()</code>函数，在这个函数里判断到调用者 <code>__isCls</code> 属性，知道它是代表 OC 类，把方法名和类名传递给 OC 完成调用。实现类似OC/Lua/Ruby等的消息转发机制：</p>
+<pre class=" language-javascript"><code class="language-javascript">UIView<span class="token punctuation">.</span><span class="token function">alloc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token operator">-</span><span class="token operator">></span>
+UIView<span class="token punctuation">.</span><span class="token function">__c</span><span class="token punctuation">(</span><span class="token string">'alloc'</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">__c</span><span class="token punctuation">(</span><span class="token string">'init'</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<pre class=" language-javascript"><code class="language-javascript">Object<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>__c <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span>methodName<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span>__obj <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span>__clsName<span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">[</span>methodName<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">var</span> self <span class="token operator">=</span> <span class="token keyword">this</span>
+  <span class="token keyword">return</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">var</span> args <span class="token operator">=</span> Array<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>slice<span class="token punctuation">.</span><span class="token function">call</span><span class="token punctuation">(</span>arguments<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token function">_methodFunc</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span>__obj<span class="token punctuation">,</span> self<span class="token punctuation">.</span>__clsName<span class="token punctuation">,</span> methodName<span class="token punctuation">,</span> args<span class="token punctuation">,</span> self<span class="token punctuation">.</span>__isSuper<span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
 <p><code>_methodFunc()</code> 就是把相关信息传给OC，OC用 Runtime 接口调用相应方法，返回结果值，这个调用就结束了。</p>
 <p>b.对于一个自定义id对象，JavaScriptCore 会把这个自定义对象的指针传给 JS，这个对象在 JS 无法使用，但在回传给 OC 时 OC 可以找到这个对象。对于这个对象生命周期的管理，如果JS有变量引用时，这个 OC 对象引用计数就加1 ，JS 变量的引用释放了就减1，如果 OC 上没别的持有者，这个OC对象的生命周期就跟着 JS 走了，会在 JS 进行垃圾回收时释放。</p>
-<p>####消息传递</p>
-<p>消息传递使用了JavaScriptCore 的接口，OC端在启动JSPatch引擎时会创建一个 JSContext 实例，JSContext 是JS代码的执行环境，可以给 JSContext 添加方法，JS就可以直接调用这个方法。JS通过调用 JSContext 定义的方法把数据传给OC，OC通过返回值传会给JS：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">JSContext *context = [[JSContext alloc] init];</span><br><span class="line">context[@<span class="string">"hello"</span>] = ^(NSString *msg) &#123;</span><br><span class="line">    NSLog(@<span class="string">"hello %@"</span>, msg);</span><br><span class="line">&#125;;</span><br><span class="line">[_context evaluateScript:@<span class="string">"hello('word')"</span>];</span><br></pre></td></tr></table></figure>
+<h4 id="消息传递"><a href="#消息传递" class="headerlink" title="消息传递"></a>消息传递</h4><p>消息传递使用了JavaScriptCore 的接口，OC端在启动JSPatch引擎时会创建一个 JSContext 实例，JSContext 是JS代码的执行环境，可以给 JSContext 添加方法，JS就可以直接调用这个方法。JS通过调用 JSContext 定义的方法把数据传给OC，OC通过返回值传会给JS：</p>
+<pre class=" language-javascript"><code class="language-javascript">JSContext <span class="token operator">*</span>context <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">[</span>JSContext alloc<span class="token punctuation">]</span> init<span class="token punctuation">]</span><span class="token punctuation">;</span>
+context<span class="token punctuation">[</span>@<span class="token string">"hello"</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token operator">^</span><span class="token punctuation">(</span>NSString <span class="token operator">*</span>msg<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">NSLog</span><span class="token punctuation">(</span>@<span class="token string">"hello %@"</span><span class="token punctuation">,</span> msg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">[</span>_context evaluateScript<span class="token punctuation">:</span>@<span class="token string">"hello('word')"</span><span class="token punctuation">]</span><span class="token punctuation">;</span>   
+</code></pre>
 <h4 id="方法替换"><a href="#方法替换" class="headerlink" title="方法替换"></a>方法替换</h4><p>让<code>ORIGViewDidLoad</code>指向<code>viewDidLoad</code>,<code>viewDidLoad</code>指向新的实现<code>viewDidLoadIMP</code>。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">static void viewDidLoadIMP (id slf, SEL sel) &#123;</span><br><span class="line">   JSValue *jsFunction = …;</span><br><span class="line">   [jsFunction callWithArguments:nil];</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">Class cls = NSClassFromString(@&quot;UIViewController&quot;);</span><br><span class="line">SEL selector = @selector(viewDidLoad);</span><br><span class="line">Method method = class_getInstanceMethod(cls, selector);</span><br><span class="line"> </span><br><span class="line">//获得viewDidLoad方法的函数指针</span><br><span class="line">IMP imp = method_getImplementation(method)</span><br><span class="line"> </span><br><span class="line">//获得viewDidLoad方法的参数类型</span><br><span class="line">char *typeDescription = (char *)method_getTypeEncoding(method);</span><br><span class="line"> </span><br><span class="line">//新增一个ORIGViewDidLoad方法，指向原来的viewDidLoad实现</span><br><span class="line">class_addMethod(cls, @selector(ORIGViewDidLoad), imp, typeDescription);</span><br><span class="line"> </span><br><span class="line">//把viewDidLoad IMP指向自定义新的实现</span><br><span class="line">class_replaceMethod(cls, selector, viewDidLoadIMP, typeDescription);</span><br></pre></td></tr></table></figure>
+<pre class=" language-objective-c"><code class="language-objective-c">static void viewDidLoadIMP (id slf, SEL sel) {
+   JSValue *jsFunction = …;
+   [jsFunction callWithArguments:nil];
+}
+
+Class cls = NSClassFromString(@"UIViewController");
+SEL selector = @selector(viewDidLoad);
+Method method = class_getInstanceMethod(cls, selector);
+
+//获得viewDidLoad方法的函数指针
+IMP imp = method_getImplementation(method)
+
+//获得viewDidLoad方法的参数类型
+char *typeDescription = (char *)method_getTypeEncoding(method);
+
+//新增一个ORIGViewDidLoad方法，指向原来的viewDidLoad实现
+class_addMethod(cls, @selector(ORIGViewDidLoad), imp, typeDescription);
+
+//把viewDidLoad IMP指向自定义新的实现
+class_replaceMethod(cls, selector, viewDidLoadIMP, typeDescription);
+</code></pre>
 <p>替换 UIViewController 的 -viewWillAppear: 方法为例：</p>
 <ol>
 <li><p>把UIViewController的 <code>-viewWillAppear:</code> 方法通过 <code>class_replaceMethod()</code> 接口指向 <code>_objc_msgForward</code>，这是一个全局 IMP，OC 调用方法不存在时都会转发到这个 IMP 上，这里直接把方法替换成这个 IMP，这样调用这个方法时就会走到 <code>-forwardInvocation:</code>。</p>
@@ -455,84 +522,310 @@
 <p>​</p>
 </li>
 </ol>
-<p>##JSPatch使用</p>
-<h3 id="OC与JSPatch代码转换"><a href="#OC与JSPatch代码转换" class="headerlink" title="OC与JSPatch代码转换"></a>OC与JSPatch代码转换</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">//OC</span><br><span class="line">@interface CompareJSPatchController : UITableViewController</span><br><span class="line">@end</span><br><span class="line">    </span><br><span class="line">@interface CompareJSPatchController()&lt;UIAlertViewDelegate&gt;</span><br><span class="line">    </span><br><span class="line">@end</span><br><span class="line">    </span><br><span class="line">@implementation CompareJSPatchController</span><br><span class="line"></span><br><span class="line">- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView &#123;</span><br><span class="line">    return 1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section &#123;</span><br><span class="line">    return [self dataSource].count;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath &#123;</span><br><span class="line">    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@&quot;cell&quot;];</span><br><span class="line">    if (!cell) &#123;</span><br><span class="line">        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@&quot;cell&quot;];</span><br><span class="line">    &#125;</span><br><span class="line">    cell.textLabel.text = [self dataSource][indexPath.row];</span><br><span class="line">    return cell;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath &#123;</span><br><span class="line">    return 60;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath &#123;</span><br><span class="line">    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@&quot;Alert&quot; message:[self dataSource][indexPath.row] delegate:self cancelButtonTitle:@&quot;OK&quot; otherButtonTitles:nil];</span><br><span class="line">    [alertView show];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex &#123;</span><br><span class="line">    </span><br><span class="line">    NSLog(@&quot;click btn %@&quot;,[alertView buttonTitleAtIndex:buttonIndex]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">- (NSArray *)dataSource &#123;</span><br><span class="line">    </span><br><span class="line">    if (_data == nil) &#123;</span><br><span class="line">        _data = [NSMutableArray array];</span><br><span class="line">        for (int i = 0; i &lt; 20; i++) &#123;</span><br><span class="line">            [_data addObject:[NSString stringWithFormat:@&quot;cell from js %d&quot;,i]];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return _data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//JSPatch</span></span><br><span class="line">defineClass(<span class="string">'CompareJSPatchController : UITableViewController &lt;UIAlertViewDelegate&gt;'</span>, [<span class="string">'data'</span>], &#123;</span><br><span class="line">            </span><br><span class="line">    dataSource: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> data = self.data();</span><br><span class="line">    <span class="keyword">if</span> (data) <span class="keyword">return</span> data;</span><br><span class="line">    <span class="keyword">var</span> data = [];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">20</span>; i ++) &#123;</span><br><span class="line">    data.push(<span class="string">"cell from js "</span> + i);</span><br><span class="line">    &#125;</span><br><span class="line">    self.setData(data)</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    numberOfSectionsInTableView: <span class="function"><span class="keyword">function</span>(<span class="params">tableView</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    tableView_numberOfRowsInSection: <span class="function"><span class="keyword">function</span>(<span class="params">tableView, section</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> self.dataSource().length;</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    tableView_cellForRowAtIndexPath: <span class="function"><span class="keyword">function</span>(<span class="params">tableView, indexPath</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> cell = tableView.dequeueReusableCellWithIdentifier(<span class="string">"cell"</span>)</span><br><span class="line">    <span class="keyword">if</span> (!cell) &#123;</span><br><span class="line">    cell = <span class="built_in">require</span>(<span class="string">'UITableViewCell'</span>).alloc().initWithStyle_reuseIdentifier(<span class="number">0</span>, <span class="string">"cell"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    cell.textLabel().setText(self.dataSource()[indexPath.row()])</span><br><span class="line">    <span class="keyword">return</span> cell</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    tableView_heightForRowAtIndexPath: <span class="function"><span class="keyword">function</span>(<span class="params">tableView, indexPath</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">60</span></span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    tableView_didSelectRowAtIndexPath: <span class="function"><span class="keyword">function</span>(<span class="params">tableView, indexPath</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> alertView = <span class="built_in">require</span>(<span class="string">'UIAlertView'</span>).alloc().initWithTitle_message_delegate_cancelButtonTitle_otherButtonTitles(<span class="string">"Alert"</span>,self.dataSource()[indexPath.row()], self, <span class="string">"OK"</span>,  <span class="literal">null</span>);</span><br><span class="line">    alertView.show()</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    alertView_willDismissWithButtonIndex: <span class="function"><span class="keyword">function</span>(<span class="params">alertView, idx</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'click btn '</span> + alertView.buttonTitleAtIndex(idx).toJS())</span><br><span class="line">    &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h2 id="JSPatch使用"><a href="#JSPatch使用" class="headerlink" title="JSPatch使用"></a>JSPatch使用</h2><h3 id="OC与JSPatch代码转换"><a href="#OC与JSPatch代码转换" class="headerlink" title="OC与JSPatch代码转换"></a>OC与JSPatch代码转换</h3><pre class=" language-objective-c"><code class="language-objective-c">//OC
+@interface CompareJSPatchController : UITableViewController
+@end
+
+@interface CompareJSPatchController()<uialertviewdelegate>
+
+@end
+
+@implementation CompareJSPatchController
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return [self dataSource].count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
+    }
+    cell.textLabel.text = [self dataSource][indexPath.row];
+    return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 60;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Alert" message:[self dataSource][indexPath.row] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alertView show];
+}
+
+- (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex {
+
+    NSLog(@"click btn %@",[alertView buttonTitleAtIndex:buttonIndex]);
+}
+
+
+- (NSArray *)dataSource {
+
+    if (_data == nil) {
+        _data = [NSMutableArray array];
+        for (int i = 0; i < 20; i++) {
+            [_data addObject:[NSString stringWithFormat:@"cell from js %d",i]];
+        }
+    }
+    return _data;
+}
+
+@end
+</uialertviewdelegate></code></pre>
+<pre class=" language-js"><code class="language-js"><span class="token comment" spellcheck="true">//JSPatch</span>
+<span class="token function">defineClass</span><span class="token punctuation">(</span><span class="token string">'CompareJSPatchController : UITableViewController &lt;UIAlertViewDelegate>'</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+
+    dataSource<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> data <span class="token operator">=</span> self<span class="token punctuation">.</span><span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token keyword">return</span> data<span class="token punctuation">;</span>
+    <span class="token keyword">var</span> data <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">var</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">20</span><span class="token punctuation">;</span> i <span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    data<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token string">"cell from js "</span> <span class="token operator">+</span> i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    self<span class="token punctuation">.</span><span class="token function">setData</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> data<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+
+    numberOfSectionsInTableView<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>tableView<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+
+    tableView_numberOfRowsInSection<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>tableView<span class="token punctuation">,</span> section<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> self<span class="token punctuation">.</span><span class="token function">dataSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>length<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+
+    tableView_cellForRowAtIndexPath<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>tableView<span class="token punctuation">,</span> indexPath<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> cell <span class="token operator">=</span> tableView<span class="token punctuation">.</span><span class="token function">dequeueReusableCellWithIdentifier</span><span class="token punctuation">(</span><span class="token string">"cell"</span><span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>cell<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    cell <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UITableViewCell'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">alloc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">initWithStyle_reuseIdentifier</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token string">"cell"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    cell<span class="token punctuation">.</span><span class="token function">textLabel</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setText</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span><span class="token function">dataSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span>indexPath<span class="token punctuation">.</span><span class="token function">row</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> cell
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+
+    tableView_heightForRowAtIndexPath<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>tableView<span class="token punctuation">,</span> indexPath<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token number">60</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+
+    tableView_didSelectRowAtIndexPath<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>tableView<span class="token punctuation">,</span> indexPath<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> alertView <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UIAlertView'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">alloc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">initWithTitle_message_delegate_cancelButtonTitle_otherButtonTitles</span><span class="token punctuation">(</span><span class="token string">"Alert"</span><span class="token punctuation">,</span>self<span class="token punctuation">.</span><span class="token function">dataSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span>indexPath<span class="token punctuation">.</span><span class="token function">row</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span> self<span class="token punctuation">,</span> <span class="token string">"OK"</span><span class="token punctuation">,</span>  <span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    alertView<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+
+    alertView_willDismissWithButtonIndex<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>alertView<span class="token punctuation">,</span> idx<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'click btn '</span> <span class="token operator">+</span> alertView<span class="token punctuation">.</span><span class="token function">buttonTitleAtIndex</span><span class="token punctuation">(</span>idx<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toJS</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
 <h4 id="defineClass"><a href="#defineClass" class="headerlink" title="defineClass"></a>defineClass</h4><p><code>defineClass(classDeclaration, [properties] instanceMethods, classMethods)</code></p>
 <p>@param <code>classDeclaration</code>: 字符串，<code>className:superClassName &lt;Protocol&gt;</code></p>
 <p>@param <code>properties</code>: 新增property，字符串数组，可省略 </p>
 <p>@param <code>instanceMethods</code>: 要添加或覆盖的实例方法 </p>
 <p>@param <code>classMethods</code>: 要添加或覆盖的类方法</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">defineClass(<span class="string">"类名"</span>,[<span class="string">"成员变量"</span>], &#123;</span><br><span class="line">    <span class="comment">//实例方法,不同方法之间使用逗号分隔</span></span><br><span class="line">    viewDidLoad:<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="comment">//do something</span></span><br><span class="line">    &#125;,</span><br><span class="line">    ...</span><br><span class="line">&#125;,</span><br><span class="line">    &#123;</span><br><span class="line">    <span class="comment">//类方法,不同方法之间使用逗号分隔</span></span><br><span class="line">    getClassName:<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(self.class());</span><br><span class="line">        <span class="keyword">return</span> self.class();</span><br><span class="line">    &#125;,</span><br><span class="line">    ...</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>####ORIG使用原方法</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">defineClass(<span class="string">"类名"</span>,[<span class="string">"成员变量"</span>], &#123;</span><br><span class="line">    <span class="comment">//覆盖原方法</span></span><br><span class="line">    viewDidLoad:<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="comment">//do something</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">//使用原方法</span></span><br><span class="line">    ORGIviewDidLoad:<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="comment">//do something</span></span><br><span class="line">    &#125;,</span><br><span class="line">    ...</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<pre class=" language-js"><code class="language-js"><span class="token function">defineClass</span><span class="token punctuation">(</span><span class="token string">"类名"</span><span class="token punctuation">,</span><span class="token punctuation">[</span><span class="token string">"成员变量"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//实例方法,不同方法之间使用逗号分隔</span>
+    viewDidLoad<span class="token punctuation">:</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//do something</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token operator">...</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//类方法,不同方法之间使用逗号分隔</span>
+    getClassName<span class="token punctuation">:</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>self<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token operator">...</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="ORIG使用原方法"><a href="#ORIG使用原方法" class="headerlink" title="ORIG使用原方法"></a>ORIG使用原方法</h4><pre class=" language-javascript"><code class="language-javascript"><span class="token function">defineClass</span><span class="token punctuation">(</span><span class="token string">"类名"</span><span class="token punctuation">,</span><span class="token punctuation">[</span><span class="token string">"成员变量"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//覆盖原方法</span>
+    viewDidLoad<span class="token punctuation">:</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//do something</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token comment" spellcheck="true">//使用原方法</span>
+    ORGIviewDidLoad<span class="token punctuation">:</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//do something</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token operator">...</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
 <h4 id="导入头文件"><a href="#导入头文件" class="headerlink" title="导入头文件"></a>导入头文件</h4><p><code>require(&#39;UIColor,UIView,NSURL,NSURLRequest,UIFont,UILabel&#39;);</code></p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">'UIView'</span>)</span><br><span class="line"><span class="keyword">var</span> view = UIView.alloc().init()</span><br><span class="line">view.setBackgroundColor(<span class="built_in">require</span>(<span class="string">'UIColor'</span>).grayColor())</span><br><span class="line">view.setAlpha(<span class="number">0.5</span>)</span><br></pre></td></tr></table></figure>
-<p>####Protocol</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//JSPatch</span></span><br><span class="line">defineClass(<span class="string">"JPViewController: UIViewController &lt;UIAlertViewDelegate&gt;"</span>, &#123;</span><br><span class="line">  viewDidAppear: <span class="function"><span class="keyword">function</span>(<span class="params">animated</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> alertView = <span class="built_in">require</span>(<span class="string">'UIAlertView'</span>).alloc().initWithTitle_message_delegate_cancelButtonTitle_otherButtonTitles(<span class="string">"Alert"</span>, self.dataSource().objectAtIndex(indexPath.row()), self, <span class="string">"OK"</span>, <span class="literal">null</span>)</span><br><span class="line">     alertView.show()</span><br><span class="line">  &#125;,</span><br><span class="line">    </span><br><span class="line">  alertView_clickedButtonAtIndex: <span class="function"><span class="keyword">function</span>(<span class="params">alertView, buttonIndex</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'clicked index '</span> + buttonIndex)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>####动态新增 Property</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">defineClass(<span class="string">"JPTableViewController"</span>, [<span class="string">'data'</span>, <span class="string">'totalCount'</span>], &#123;</span><br><span class="line">  init: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">     self = self.super().init()</span><br><span class="line">     self.setData([<span class="string">"a"</span>, <span class="string">"b"</span>])     <span class="comment">//添加新的 Property (id data)</span></span><br><span class="line">     self.setTotalCount(<span class="number">2</span>)</span><br><span class="line">     <span class="keyword">return</span> self</span><br><span class="line">  &#125;,</span><br><span class="line">  viewDidLoad: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">     <span class="keyword">var</span> data = self.data()     <span class="comment">//获取 Property 值</span></span><br><span class="line">     <span class="keyword">var</span> totalCount = self.totalCount()</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>####结构体</p>
-<p><code>JSPatch</code>原生支持 <code>CGRect / CGPoint / CGSize / NSRange</code> 这四个 <code>struct</code> 类型，用 <code>JS</code> 对象表示:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">CGRectMake(20, 20, 100, 100)                      //OC</span><br><span class="line">&#123;x:20, y:20, width:100, height:100&#125;               //JSPatch</span><br><span class="line"></span><br><span class="line">CGPointMake(10,10)                                //OC</span><br><span class="line">&#123;x: 10, y: 10&#125;                                    //JSPatch</span><br><span class="line"></span><br><span class="line">CGSizeMake(100, 100)                              //OC</span><br><span class="line">&#123;width: 100, height:100&#125;                          //JSPatch</span><br><span class="line"></span><br><span class="line">NSMakeRange(0, 1)                                 //OC</span><br><span class="line">&#123;location: 0, length: 1&#125;                          //JSPatch</span><br></pre></td></tr></table></figure>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UIView'</span><span class="token punctuation">)</span>
+<span class="token keyword">var</span> view <span class="token operator">=</span> UIView<span class="token punctuation">.</span><span class="token function">alloc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+view<span class="token punctuation">.</span><span class="token function">setBackgroundColor</span><span class="token punctuation">(</span><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UIColor'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">grayColor</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+view<span class="token punctuation">.</span><span class="token function">setAlpha</span><span class="token punctuation">(</span><span class="token number">0.5</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="Protocol"><a href="#Protocol" class="headerlink" title="Protocol"></a>Protocol</h4><pre class=" language-javascript"><code class="language-javascript"><span class="token comment" spellcheck="true">//JSPatch</span>
+<span class="token function">defineClass</span><span class="token punctuation">(</span><span class="token string">"JPViewController: UIViewController &lt;UIAlertViewDelegate>"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  viewDidAppear<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>animated<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">var</span> alertView <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'UIAlertView'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">alloc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">initWithTitle_message_delegate_cancelButtonTitle_otherButtonTitles</span><span class="token punctuation">(</span><span class="token string">"Alert"</span><span class="token punctuation">,</span> self<span class="token punctuation">.</span><span class="token function">dataSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">objectAtIndex</span><span class="token punctuation">(</span>indexPath<span class="token punctuation">.</span><span class="token function">row</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> self<span class="token punctuation">,</span> <span class="token string">"OK"</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">)</span>
+     alertView<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+  alertView_clickedButtonAtIndex<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span>alertView<span class="token punctuation">,</span> buttonIndex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'clicked index '</span> <span class="token operator">+</span> buttonIndex<span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="动态新增-Property"><a href="#动态新增-Property" class="headerlink" title="动态新增 Property"></a>动态新增 Property</h4><pre class=" language-js"><code class="language-js"><span class="token function">defineClass</span><span class="token punctuation">(</span><span class="token string">"JPTableViewController"</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token string">'data'</span><span class="token punctuation">,</span> <span class="token string">'totalCount'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  init<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     self <span class="token operator">=</span> self<span class="token punctuation">.</span><span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+     self<span class="token punctuation">.</span><span class="token function">setData</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">"a"</span><span class="token punctuation">,</span> <span class="token string">"b"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>     <span class="token comment" spellcheck="true">//添加新的 Property (id data)</span>
+     self<span class="token punctuation">.</span><span class="token function">setTotalCount</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span>
+     <span class="token keyword">return</span> self
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  viewDidLoad<span class="token punctuation">:</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     <span class="token keyword">var</span> data <span class="token operator">=</span> self<span class="token punctuation">.</span><span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span>     <span class="token comment" spellcheck="true">//获取 Property 值</span>
+     <span class="token keyword">var</span> totalCount <span class="token operator">=</span> self<span class="token punctuation">.</span><span class="token function">totalCount</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="结构体"><a href="#结构体" class="headerlink" title="结构体"></a>结构体</h4><p><code>JSPatch</code>原生支持 <code>CGRect / CGPoint / CGSize / NSRange</code> 这四个 <code>struct</code> 类型，用 <code>JS</code> 对象表示:</p>
+<pre class=" language-objective-c"><code class="language-objective-c">CGRectMake(20, 20, 100, 100)                      //OC
+{x:20, y:20, width:100, height:100}               //JSPatch
+
+CGPointMake(10,10)                                //OC
+{x: 10, y: 10}                                    //JSPatch
+
+CGSizeMake(100, 100)                              //OC
+{width: 100, height:100}                          //JSPatch
+
+NSMakeRange(0, 1)                                 //OC
+{location: 0, length: 1}                          //JSPatch
+</code></pre>
 <ul>
 <li><p>若要让 JS 脚本支持其他 struct 类型，需要先手动注册<a href="https://github.com/bang590/JSPatch/wiki/添加-struct-类型支持" target="_blank" rel="noopener">添加 struct 类型支持</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//支持 CGAffineTransform</span><br><span class="line">require(&apos;JPEngine&apos;).defineStruct(&#123;</span><br><span class="line">  &quot;name&quot;: &quot;CGAffineTransform&quot;,</span><br><span class="line">  &quot;types&quot;: &quot;FFFFFF&quot;,</span><br><span class="line">  &quot;keys&quot;: [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;tx&quot;, &quot;ty&quot;]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-</li>
+<pre><code>//支持 CGAffineTransform
+require(&#39;JPEngine&#39;).defineStruct({
+  &quot;name&quot;: &quot;CGAffineTransform&quot;,
+  &quot;types&quot;: &quot;FFFFFF&quot;,
+  &quot;keys&quot;: [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;tx&quot;, &quot;ty&quot;]
+})
+</code></pre></li>
 </ul>
-<p>####Selector </p>
-<p>在JS使用字符串代表 <code>Selector</code>（需要使用“ ”包裹字符串）:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">//Obj-C</span><br><span class="line">[self performSelector:@selector(viewWillAppear:) withObject:@(YES)];</span><br><span class="line"></span><br><span class="line">//JS</span><br><span class="line">self.performSelector_withObject(&quot;viewWillAppear:&quot;, 1)</span><br></pre></td></tr></table></figure>
+<h4 id="Selector"><a href="#Selector" class="headerlink" title="Selector"></a>Selector</h4><p>在JS使用字符串代表 <code>Selector</code>（需要使用“ ”包裹字符串）:</p>
+<pre class=" language-objective-c"><code class="language-objective-c">//Obj-C
+[self performSelector:@selector(viewWillAppear:) withObject:@(YES)];
+
+//JS
+self.performSelector_withObject("viewWillAppear:", 1)
+</code></pre>
 <h4 id="打印"><a href="#打印" class="headerlink" title="打印"></a>打印</h4><p><code>console.log()</code></p>
-<p>####nil</p>
-<p>JS 上的 <code>null</code> 和 <code>undefined</code> 都代表 OC 的 <code>nil</code>，如果要表示 <code>NSNull</code>, 用 <code>nsnull</code> 代替，如果要表示 <code>NULL</code>, 也用 <code>null</code> 代替</p>
-<p>####NSArray / NSString / NSDictionary</p>
-<p><code>NSArray / NSString / NSDictionary</code> 不会自动转成对应的 JS 类型，像普通 <code>NSObject</code> 一样使用它们</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//在OC中创建的数组和字典</span><br><span class="line">@implementation JPObject</span><br><span class="line">+ (NSArray *)data &#123;</span><br><span class="line">  return @[[NSMutableString stringWithString:@&quot;JS&quot;]]</span><br><span class="line">&#125;</span><br><span class="line">+ (NSMutableDictionary *)dict &#123;</span><br><span class="line">    return [[NSMutableDictionary alloc] init];</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//在JSPatch中获取与使用</span></span><br><span class="line"><span class="built_in">require</span>(<span class="string">'JPObject'</span>)</span><br><span class="line"><span class="keyword">var</span> ocStr = JPObject.data().objectAtIndex(<span class="number">0</span>)</span><br><span class="line">ocStr.appendString(<span class="string">"Patch"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> dict = JPObject.dict()</span><br><span class="line">dict.setObject_forKey(ocStr, <span class="string">'name'</span>)</span><br><span class="line"><span class="built_in">console</span>.log(dict.objectForKey(<span class="string">'name'</span>))</span><br></pre></td></tr></table></figure>
-<p>####weak / strong</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> weakSelf = __weak(self)</span><br><span class="line">self.setCompleteBlock(block(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">var</span> strongSelf = __strong(self)</span><br><span class="line">    ...</span><br><span class="line">&#125;))</span><br></pre></td></tr></table></figure>
-<p>####Block</p>
-<ul>
+<h4 id="nil"><a href="#nil" class="headerlink" title="nil"></a>nil</h4><p>JS 上的 <code>null</code> 和 <code>undefined</code> 都代表 OC 的 <code>nil</code>，如果要表示 <code>NSNull</code>, 用 <code>nsnull</code> 代替，如果要表示 <code>NULL</code>, 也用 <code>null</code> 代替</p>
+<h4 id="NSArray-NSString-NSDictionary"><a href="#NSArray-NSString-NSDictionary" class="headerlink" title="NSArray / NSString / NSDictionary"></a>NSArray / NSString / NSDictionary</h4><p><code>NSArray / NSString / NSDictionary</code> 不会自动转成对应的 JS 类型，像普通 <code>NSObject</code> 一样使用它们</p>
+<pre class=" language-objective-c"><code class="language-objective-c">//在OC中创建的数组和字典
+@implementation JPObject
++ (NSArray *)data {
+  return @[[NSMutableString stringWithString:@"JS"]]
+}
++ (NSMutableDictionary *)dict {
+    return [[NSMutableDictionary alloc] init];
+}
+@end
+</code></pre>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token comment" spellcheck="true">//在JSPatch中获取与使用</span>
+<span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'JPObject'</span><span class="token punctuation">)</span>
+<span class="token keyword">var</span> ocStr <span class="token operator">=</span> JPObject<span class="token punctuation">.</span><span class="token function">data</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">objectAtIndex</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+ocStr<span class="token punctuation">.</span><span class="token function">appendString</span><span class="token punctuation">(</span><span class="token string">"Patch"</span><span class="token punctuation">)</span>
+
+<span class="token keyword">var</span> dict <span class="token operator">=</span> JPObject<span class="token punctuation">.</span><span class="token function">dict</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+dict<span class="token punctuation">.</span><span class="token function">setObject_forKey</span><span class="token punctuation">(</span>ocStr<span class="token punctuation">,</span> <span class="token string">'name'</span><span class="token punctuation">)</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>dict<span class="token punctuation">.</span><span class="token function">objectForKey</span><span class="token punctuation">(</span><span class="token string">'name'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="weak-strong"><a href="#weak-strong" class="headerlink" title="weak / strong"></a>weak / strong</h4><pre class=" language-js"><code class="language-js"><span class="token keyword">var</span> weakSelf <span class="token operator">=</span> <span class="token function">__weak</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span>
+self<span class="token punctuation">.</span><span class="token function">setCompleteBlock</span><span class="token punctuation">(</span><span class="token function">block</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token operator">...</span>
+    <span class="token keyword">var</span> strongSelf <span class="token operator">=</span> <span class="token function">__strong</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span>
+    <span class="token operator">...</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="Block"><a href="#Block" class="headerlink" title="Block"></a>Block</h4><ul>
 <li><p>block传值</p>
 <p>将JS函数作为block传递给OC</p>
 <p>需要使用<code>block(paramTypes, function)</code>接口包装</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+ (void)request:(void(^)(NSString *content, BOOL success))callback &#123;</span><br><span class="line">    callback(@&quot;I&apos;m content&quot;, YES);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">'JPEngine'</span>).addExtensions([<span class="string">'JPBlock'</span>]);<span class="comment">//接入JPBlock扩展，使用完整的block</span></span><br><span class="line"><span class="built_in">require</span>(<span class="string">'ViewController'</span>).request(block(<span class="string">"void, NSString *, BOOL"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">ctn, succ</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (succ) log(ctn)  <span class="comment">//output: I'm content</span></span><br><span class="line">&#125;));</span><br></pre></td></tr></table></figure>
+<pre class=" language-objective-c"><code class="language-objective-c">+ (void)request:(void(^)(NSString *content, BOOL success))callback {
+    callback(@"I'm content", YES);
+}
+</code></pre>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'JPEngine'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">addExtensions</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'JPBlock'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//接入JPBlock扩展，使用完整的block</span>
+<span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'ViewController'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">request</span><span class="token punctuation">(</span><span class="token function">block</span><span class="token punctuation">(</span><span class="token string">"void, NSString *, BOOL"</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span>ctn<span class="token punctuation">,</span> succ<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>succ<span class="token punctuation">)</span> <span class="token function">log</span><span class="token punctuation">(</span>ctn<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true">//output: I'm content</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
 <p>将OC中的block传递给JSPatch</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">typedef void(^JPBlock)(NSDictionary *dict);</span><br><span class="line">+ (JPBlock)getBlock &#123;</span><br><span class="line">    NSString *ctn = @&quot;JSPatch&quot;;</span><br><span class="line">    JPBlock block = ^(NSDictionary *dict) &#123;</span><br><span class="line">        NSLog(@&quot;I&apos;m %@, version: %@&quot;, ctn, dict[@&quot;version&quot;]);</span><br><span class="line">    &#125;;</span><br><span class="line">    return block;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> block = <span class="built_in">require</span>(<span class="string">'ViewController'</span>).getBlock();</span><br><span class="line">block(&#123;<span class="attr">version</span>:<span class="string">'1.0.0'</span>&#125;);</span><br></pre></td></tr></table></figure>
+<pre class=" language-objective-c"><code class="language-objective-c">typedef void(^JPBlock)(NSDictionary *dict);
++ (JPBlock)getBlock {
+    NSString *ctn = @"JSPatch";
+    JPBlock block = ^(NSDictionary *dict) {
+        NSLog(@"I'm %@, version: %@", ctn, dict[@"version"]);
+    };
+    return block;
+}
+</code></pre>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">var</span> block <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'ViewController'</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getBlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">block</span><span class="token punctuation">(</span><span class="token punctuation">{</span>version<span class="token punctuation">:</span><span class="token string">'1.0.0'</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
 <p>总结：JS 没有 block 类型的变量，OC 的 block 对象传到 JS 会变成 JS function，所有要从 JS 传 block 给 OC 都需要用 <code>block()</code> 接口包装。</p>
 </li>
 <li><p><a href="https://github.com/bang590/JSPatch/wiki/JPBlock-扩展使用文档" target="_blank" rel="noopener">JPBlock扩展</a></p>
 </li>
 </ul>
-<p>####GCD</p>
-<p>使用 <code>dispatch_after() dispatch_async_main()</code> <code>dispatch_sync_main() dispatch_async_global_queue()</code> 接口调用GCD方法:</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">dispatch_after(<span class="number">1.0</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="comment">// do something</span></span><br><span class="line">&#125;)</span><br><span class="line">dispatch_async_main(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="comment">// do something</span></span><br><span class="line">&#125;)</span><br><span class="line">dispatch_sync_main(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="comment">// do something</span></span><br><span class="line">&#125;)</span><br><span class="line">dispatch_async_global_queue(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="comment">// do something</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p>####枚举、宏、全局变量</p>
-<ul>
+<h4 id="GCD"><a href="#GCD" class="headerlink" title="GCD"></a>GCD</h4><p>使用 <code>dispatch_after() dispatch_async_main()</code> <code>dispatch_sync_main() dispatch_async_global_queue()</code> 接口调用GCD方法:</p>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token function">dispatch_after</span><span class="token punctuation">(</span><span class="token number">1.0</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// do something</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token function">dispatch_async_main</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// do something</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token function">dispatch_sync_main</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// do something</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token function">dispatch_async_global_queue</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// do something</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre>
+<h4 id="枚举、宏、全局变量"><a href="#枚举、宏、全局变量" class="headerlink" title="枚举、宏、全局变量"></a>枚举、宏、全局变量</h4><ul>
 <li><p>OC中的枚举 要直接换成 具体值替换 <code>UIControlEventTouchUpInside</code> =&gt; <code>1&lt;&lt;6</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[btn addTarget:self action:@selector(handleBtn) forControlEvents:UIControlEventTouchUpInside];</span><br></pre></td></tr></table></figure>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">btn.addTarget_action_forControlEvents(self, <span class="string">"handleBtn"</span>, <span class="number">1</span>&lt;&lt;<span class="number">6</span>);</span><br></pre></td></tr></table></figure>
+<pre class=" language-objective-c"><code class="language-objective-c">[btn addTarget:self action:@selector(handleBtn) forControlEvents:UIControlEventTouchUpInside];
+</code></pre>
+<pre class=" language-js"><code class="language-js">btn<span class="token punctuation">.</span><span class="token function">addTarget_action_forControlEvents</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> <span class="token string">"handleBtn"</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token operator">&lt;</span><span class="token operator">&lt;</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
 </li>
 <li><p>宏</p>
 <p>Objective-C 里的宏不能直接在 JS 上使用，可以使用全局变量替代</p>
 </li>
 <li><p>全局变量</p>
 <p>在类里定义的 <code>static</code> 全局变量无法在 JS 上获取到，若要在 JS 拿到这个变量，需要在 OC 用get方法返回：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">static NSString *name;</span><br><span class="line">@implementation JPTestObject</span><br><span class="line">+ (NSString *)name &#123;</span><br><span class="line">  return name;</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> name = JPTestObject.name() <span class="comment">//拿到全局变量值</span></span><br></pre></td></tr></table></figure>
+<pre class=" language-objective-c"><code class="language-objective-c">static NSString *name;
+@implementation JPTestObject
++ (NSString *)name {
+  return name;
+}
+@end
+</code></pre>
+<pre class=" language-javascript"><code class="language-javascript"><span class="token keyword">var</span> name <span class="token operator">=</span> JPTestObject<span class="token punctuation">.</span><span class="token function">name</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">//拿到全局变量值</span>
+</code></pre>
 </li>
 </ul>
-<p>###<a href="https://jspatch.com/Tools/convertor" target="_blank" rel="noopener">JSPatch 代码转换器</a></p>
-<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><p>#####在 iOS8 下，JSPatch 支持使用 Safari 自带的调试工具对 JS 脚本进行断点调试</p>
-<ul>
+<h3 id="JSPatch-代码转换器"><a href="#JSPatch-代码转换器" class="headerlink" title="JSPatch 代码转换器"></a><a href="https://jspatch.com/Tools/convertor" target="_blank" rel="noopener">JSPatch 代码转换器</a></h3><h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><h5 id="在-iOS8-下，JSPatch-支持使用-Safari-自带的调试工具对-JS-脚本进行断点调试"><a href="#在-iOS8-下，JSPatch-支持使用-Safari-自带的调试工具对-JS-脚本进行断点调试" class="headerlink" title="在 iOS8 下，JSPatch 支持使用 Safari 自带的调试工具对 JS 脚本进行断点调试"></a>在 iOS8 下，JSPatch 支持使用 Safari 自带的调试工具对 JS 脚本进行断点调试</h5><ul>
 <li>开启 Safari 调试菜单：Safari -&gt; 偏好设置 -&gt; 高级 -&gt; 勾选[在菜单栏中显示“开发”菜单]</li>
 <li>启动APP -&gt; Safari -&gt; 开发 -&gt; 选择你的机器 -&gt; JSContext</li>
 <li>连接真机调试时，需要打开真机的web检查器：设置 -&gt; Safari -&gt; 高级 -&gt; Web检查器</li>
 </ul>
-<p><img src="/2018/10/21/JSPatch/JSContext.png" alt="JSContext"></p>
+<p><img src="/2018/10/21/jspatch/JSContext.png" alt="JSContext"></p>
 <h2 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h2><p><a href>JSPatchDemo</a></p>
 
             </div>
@@ -582,32 +875,32 @@
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;Previous</div>
             <div class="card">
-                <a href="/2019/03/29/tips/">
+                <a href="/2019/02/21/slam/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="踩坑笔记">
+                        <img src="/medias/featureimages/21.jpg" class="responsive-img" alt="slam 约球微信小程序开发文档">
                         
-                        <span class="card-title">踩坑笔记</span>
+                        <span class="card-title">slam 约球微信小程序开发文档</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            记录开发中碰到的一些问题，以防日后继续踩坑
-2019.04po的完整版12345678expr   变量|表达式              //显示变量或者表达式的值。expr -f h --  变量|表达式       //以16进制格式
+                             slam约球微信小程序开发文档项目说明slam约球是一款为篮球爱好者提供的篮球约战平台，用户可以创建球员档案、篮球场以及管理联盟，让周围的球友更加了解你，方便篮球爱好者相互交流。
+模块球员档案模块球员档案模块主要用于展示球员的个体信息、以
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2019-03-29
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2019-02-21
                         </span>
                         <span class="publish-author">
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/经验总结/" class="post-category" target="_blank">
-                                    经验总结
+                            <a href="/categories/设计文档/" class="post-category" target="_blank">
+                                    设计文档
                                 </a>
                             
                             
@@ -617,16 +910,16 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/tips/" target="_blank">
-                        <span class="chip bg-color">tips</span>
+                    <a href="/tags/微信小程序/" target="_blank">
+                        <span class="chip bg-color">微信小程序</span>
                     </a>
                     
-                    <a href="/tags/开发技巧/" target="_blank">
-                        <span class="chip bg-color">开发技巧</span>
+                    <a href="/tags/project/" target="_blank">
+                        <span class="chip bg-color">project</span>
                     </a>
                     
-                    <a href="/tags/踩坑/" target="_blank">
-                        <span class="chip bg-color">踩坑</span>
+                    <a href="/tags/UML/" target="_blank">
+                        <span class="chip bg-color">UML</span>
                     </a>
                     
                 </div>
@@ -802,7 +1095,7 @@
 
             
                 &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;
-                <span class="white-color">16.9k</span>
+                <span class="white-color">17.2k</span>
             
 
             
