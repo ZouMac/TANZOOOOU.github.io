@@ -4,10 +4,13 @@
 
 <head><meta name="generator" content="Hexo 3.8.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="iOS开发 — HHRouter路由数据传递开发分享, null">
-    <meta name="description" content="前言在日常开发中，随着业务越来越复杂，代码中的耦合度将会大大增强，各模块间的相互调用将导致相互间的强依赖，我们可以通过使用HHRouter路由设计思路来减少代码的耦合度。
+    <meta name="keywords" content="剑指offer系列一（1 ~ 5）, null">
+    <meta name="description" content="前言用OC刷剑指offer
+算法OC代码地址
+代码基于macOS命令行编写，测试用例已编写在单元测试中，若有遗漏的用例，欢迎留言指正。
 
-一、传统控制器间的属性传递在日常开发中经常碰到一些属性正向传递的问">
+第一题
+在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -15,7 +18,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>iOS开发 — HHRouter路由数据传递开发分享 | null</title>
+    <title>剑指offer系列一（1 ~ 5） | null</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/font-awesome.min.css">
@@ -181,13 +184,13 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/1.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/23.jpg')">
     <div class="container">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        iOS开发 — HHRouter路由数据传递开发分享
+                        剑指offer系列一（1 ~ 5）
                     </div>
                 </div>
             </div>
@@ -298,12 +301,12 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/HHRouter/" target="_blank">
-                                <span class="chip bg-color">HHRouter</span>
+                            <a href="/tags/算法/" target="_blank">
+                                <span class="chip bg-color">算法</span>
                             </a>
                         
-                            <a href="/tags/控制器间传值/" target="_blank">
-                                <span class="chip bg-color">控制器间传值</span>
+                            <a href="/tags/Objective-C/" target="_blank">
+                                <span class="chip bg-color">Objective-C</span>
                             </a>
                         
                     </div>
@@ -314,8 +317,8 @@
                     <div class="post-cate">
                         <i class="fa fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/源码学习/" class="post-category" target="_blank">
-                                源码学习
+                            <a href="/categories/剑指offer系列/" class="post-category" target="_blank">
+                                剑指offer系列
                             </a>
                         
                     </div>
@@ -333,14 +336,14 @@
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>文章字数:&nbsp;&nbsp;
-                        1.5k
+                        547
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                        6 分
+                        2 分
                     </div>
                     
                 
@@ -356,179 +359,69 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在日常开发中，随着业务越来越复杂，代码中的耦合度将会大大增强，各模块间的相互调用将导致相互间的强依赖，我们可以通过使用<code>HHRouter</code>路由设计思路来减少代码的耦合度。</p>
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>用OC刷剑指offer</p>
+<p><a href>算法OC代码地址</a></p>
+<p>代码基于macOS命令行编写，测试用例已编写在单元测试中，若有遗漏的用例，欢迎留言指正。</p>
 <a id="more"></a>
-<h1 id="一、传统控制器间的属性传递"><a href="#一、传统控制器间的属性传递" class="headerlink" title="一、传统控制器间的属性传递"></a>一、传统控制器间的属性传递</h1><p>在日常开发中经常碰到一些属性正向传递的问题，比如说<code>controllerA</code>页面 push 到<code>controllerB</code>页面，我们一般可以通过给控制器属性赋值以及初始化时将属性注入到控制器的方式进行数据的正向传递：</p>
-<pre class=" language-objc"><code class="language-objc">//赋值
-UIViewController *controllerB = [[UIViewController alloc] init];
-controllerB.name = @"xiaoming";
-controllerB.userId = @"123456";
-[self.navigationController pushViewController:controllerB animated:YES];
-
-//初始化属性注入
-UIViewController *controllerB = [[UIViewController alloc] initWithName:@"xiaoming" userId:@"123456"];
-[self.navigationController pushViewController:controllerB animated:YES];
+<h3 id="第一题"><a href="#第一题" class="headerlink" title="第一题"></a>第一题</h3><blockquote>
+<p>在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。</p>
+</blockquote>
+<pre class=" language-objc"><code class="language-objc">解题思路：
+ 1   2   3   4       9
+ 5   6   7   8      ===>     outPut  ===> true
+ 9  10  11  12
+13  14  15  16 
 </code></pre>
-<p>若需要赋值的属性过多，这么操作将会变得很繁琐，代码也会过于冗余。同时注入的方式将使得两者间产生强依赖，<code>controllerA</code>若要跳转至<code>controllerB</code>，就必须要依赖<code>controllerB</code>，当随着业务的越来越复杂，将会产生错综复杂的依赖链，增加了代码耦合性。</p>
-<h1 id="二、HHRouter实现机制与使用"><a href="#二、HHRouter实现机制与使用" class="headerlink" title="二、HHRouter实现机制与使用"></a>二、<code>HHRouter</code>实现机制与使用</h1><h2 id="2-1、控制器间的数据传递"><a href="#2-1、控制器间的数据传递" class="headerlink" title="2.1、控制器间的数据传递"></a>2.1、控制器间的数据传递</h2><p><code>HHRouter</code>是布丁动画开源的一个 router， URL Router 可以将控制器映射成唯一的 URL，其借鉴了 web 的开发思想，引入一个中介性质的 router，通过 router 完成 VC 间的数据传递。</p>
-<p><code>HHRouter</code>为<code>ViewController</code>提供了两种方法：</p>
-<pre class=" language-objc"><code class="language-objc">//将ViewController映射成对应的router
-- (void)map:(NSString *)route toControllerClass:(Class)controllerClass;
-
-//使用router匹配到对应的ViewController
-- (UIViewController *)matchController:(NSString *)route;
-</code></pre>
-<p>使用<code>HHRouter</code>将 userId 传递给<code>TZLoginViewController</code>：</p>
-<pre class=" language-objc"><code class="language-objc">[[HHRouter shared] map:@"/login/:userId/" toControllerClass:[TZLoginViewController class]];
-UIViewController *loginVC = [[HHRouter shared] matchController:@"/login/10009999/?a=6&b=7"];
-[self.navigationController pushViewController:loginVC animated:YES];
-</code></pre>
-<p>代码中的<code>@&quot;/login/10009999/&quot;</code>作为路由的链接将<code>userId</code>、<code>a</code>、<code>b</code>的值传递给<code>TZLoginViewController</code>。<br>为了实现该机制，<code>HHRouter</code>会通过 <code>subRoutesToRoute</code> 函数将路由匹配成对应规则的字典：</p>
-<pre class=" language-objc"><code class="language-objc">- (void)map:(NSString *)route toControllerClass:(Class)controllerClass {
-    NSMutableDictionary *subRoutes = [self subRoutesToRoute:route];
-    subRoutes[@"_"] = controllerClass;
-}
-
-- (NSMutableDictionary *)subRoutesToRoute:(NSString *)route {
-    NSArray *pathComponents = [self pathComponentsFromRoute:route];
-    NSInteger index = 0;
-    NSMutableDictionary *subRoutes = self.routes;
-   while (index < pathComponents.count) {
-        NSString *pathComponent = pathComponents[index];
-        if (![subRoutes objectForKey:pathComponent]) {
-            subRoutes[pathComponent] = [[NSMutableDictionary alloc] init];
-        }
-        subRoutes = subRoutes[pathComponent];
-        index++;
-    }
-    return subRoutes;
-}
-
-</code></pre>
-<p>例如：</p>
-<pre class=" language-objc"><code class="language-objc">[[HHRouter shared] map:@"/login/:userId/" toControllerClass:[TZLoginViewController class]];
-[[HHRouter shared] map:@"/register/:registerId/" toControllerClass:[TZRegisterViewController class]];
-[[HHRouter shared] map:@"/login/:userId/logout/?clearUserInfo = YES" toControllerClass:[TZLogoutViewController class]];
-</code></pre>
-<p>将这三条路由匹配成对应的路由规则字典：</p>
-<pre class=" language-objc"><code class="language-objc">@{
-      @"register" : @{
-              @":registerId" : @{
-                      @"_" : @"TZRegisterViewController"
-                      }
-              },
-      @"login" : @{
-              @":userId" : @{
-                      @"_" : @"TZLoginViewCOntroller",
-                      @"logout" : @{
-                              @"_" : @"TZLogoutViewController"
-                              }
-                      }
-              }
-}
-
-</code></pre>
-<p>匹配完成后，当有一条路由过来时，首先<code>HHRouter</code>将匹配对应的 scheme（login），当 scheme 存在时，生成参数字典 params，并传递给<code>TZLoginViewController</code>实例：</p>
-<pre class=" language-objc"><code class="language-objc">//通过router获取到对应的controller
-UIViewController *loginVC = [[HHRouter shared] matchController:@"/login/920413/?autoLogin=YES&rememberPassword=YES"];
-
-//生成参数字典
-@{
-      @"controller_class" : @"TZLoginViewController",
-      @"router"           : @"/login/920413/",
-      @"userId"           : @"920413",
-      @"autoLogin"        : @(YES),
-      @"rememberPassword" : @(YES)
-}
-
-//获取路由匹配的ViewController
- - (UIViewController *)matchController:(NSString *)route {
-    NSDictionary *params = [self paramsInRoute:route];
-    Class controllerClass = params[@"controller_class"];
-
-    UIViewController *viewController = [[controllerClass alloc] init];
-
-    if ([viewController respondsToSelector:@selector(setParams:)]) {
-        [viewController performSelector:@selector(setParams:)
-                             withObject:[params copy]];
-    }
-    return viewController;
-}
-
-</code></pre>
-<p><code>TZLoginViewController</code>中相应的参数都被绑定在 params 属性的字典里：</p>
-<pre class=" language-objc"><code class="language-objc">- (void)setParams:(NSDictionary *)params {
-    _params = params;
-
-    NSLog(@"Params: %@", params);
-}
-</code></pre>
-<p>使用HHRouter大大减小了<code>UIVIewController</code>之间的相互依赖，若<code>ViewController</code>属性不断变化，我们只需要在<code>ViewController</code>中修改使用到的属性即可，它的各项参数均可通过 URL Router 的参数完成传递，大大降低了两者间的耦合度。</p>
-<h2 id="2-2-block-数据传递"><a href="#2-2-block-数据传递" class="headerlink" title="2.2 block 数据传递"></a>2.2 block 数据传递</h2><p><code>HHRouter</code>还提供了 block 传值方式，其主要包含了三个方法：</p>
-<pre class=" language-objc"><code class="language-objc">//设置路由规则
-- (void)map:(NSString *)route toBlock:(HHRouterBlock)block;
-
-//匹配路由规则
-- (id)callBlock:(NSString *)route;
-- (HHRouterBlock)matchBlock:(NSString *)route;
-</code></pre>
-<p>其中，map 用于设置路由规则，<code>matchBlock</code>用于匹配路由规则，找到指定的 block，但是不会主动调用该 block，需要在后面手动调用。<code>callBlock</code>方法在找到指定的 block 后，立即调用。</p>
-<p>设置路由规则，映射成对应的 URL：</p>
-<pre class=" language-objc"><code class="language-objc">[[HHRouter shared] map:@"/user/add/" toBlock:^id(NSDictionary *params) {
-        NSLog(@"b = %@", [params objectForKey:@"b"]);
-        return nil;
-}];
-</code></pre>
-<p>这条规则对应的会生成一个路由规则的字典：</p>
-<pre class=" language-objc"><code class="language-objc">@{
-      @"user" : @{
-              @": add" : @{
-                      @"_" = "<__nsglobalblock__: 0x108edf138>"
-                      }
-              },
-}
-</__nsglobalblock__:></code></pre>
-<p>在对应触发事件处，匹配路由:</p>
-<pre class=" language-objc"><code class="language-objc">[[HHRouter shared] callBlock:@"/user/add/?b=20"];
-</code></pre>
-<p>匹配出的路由参数字典：</p>
-<pre class=" language-objc"><code class="language-objc">@{
-      @"block"      :   @"<__nsglobalblock__: 0x108edf138>",
-      @"router"     :   @"/user/add/?b=20",
-      @"b"          :   @"20",
- }
-</__nsglobalblock__:></code></pre>
-<p>这样匹配的参数就可以通过 block 进行回调了。</p>
-<h2 id="2-3-工厂goPage方法解析"><a href="#2-3-工厂goPage方法解析" class="headerlink" title="2.3 工厂goPage方法解析"></a>2.3 工厂<code>goPage</code>方法解析</h2><p>我们平常的项目开放中，在做组件间的跳转时总是会用到工厂的<code>goPage</code>方法，工厂<code>goPage</code>方法其实也是类似这种使用路由的方式获取相对应的控制器进行 push：</p>
-<pre class=" language-objc"><code class="language-objc">NSString *url = @"cmp://com.nd.sdp.component.transaction-flow/transaction_main_page";
-
-</code></pre>
-<p>其中<code>cmp://</code>作为匹配的 scheme，只有当 scheme 匹配成功了才会继续进行匹配，<code>com.nd.sdp.component.transaction-flow/transaction_main_page</code>是组件页面的唯一路由地址，通过<code>getPage</code>方法获取到对应的<code>APFPageWrapper</code>实例，其包含了目的控制器以及相关的参数字典,通过<code>getController</code>和<code>getParam</code>来获取：</p>
-<pre class=" language-objc"><code class="language-objc">
-APFPageWrapper *pageWrapper = [self getPage:uri];
-
-//获取URL匹配到的控制器
-UIViewController *webViewController = [pageWrapper getController];
-
-//获取URL匹配到的参数
-NSString *strTitle = [[pageWrapper getParam] objectForKey: @"title"] ? : @"";
-
-//获取源控制器
-UIViewController *sourceViewController = context[KEY_CMP_SRC_CONTROLLER];
-
-[sourceViewController.navigationController pushViewController:webViewController animated:YES];
-
-</code></pre>
-<h1 id="三、小结"><a href="#三、小结" class="headerlink" title="三、小结"></a>三、小结</h1><h3 id="优点："><a href="#优点：" class="headerlink" title="优点："></a>优点：</h3><p>通过<code>HHrouter</code>将<code>UIViewController</code>映射成 URL，从而支持页面像 web 那样通过URL进行页面跳转，首先这能够极大的减小<code>UIViewController</code>之间的耦合度，其次当每个界面都拥有唯一且不重复的 URL，将带来额外的好处。譬如你将更容易实现 Push 打开指定的界面、追踪用户浏览记录等需求。</p>
-<h3 id="缺点："><a href="#缺点：" class="headerlink" title="缺点："></a>缺点：</h3><ul>
-<li>这种基于<code>URL Router</code>方案只能传递常规对象，无法传递自定义对象。<br></li>
-<li>URL 的 map 规则是需要注册的，它们一般会在<code>load</code>方法里面写。这样会影响 App 启动速度的。<br></li>
-<li>URL 链接里面关于组件和页面的名字都是硬编码，参数也都是硬编码。而且每个 URL 参数字段都必须要一个文档进行维护，这将对业务开发人员造成负担。</li>
+<ol>
+<li>二维数组为空时，直接返回 NO</li>
+<li>第一个数大于 number 或最后一个数小于 number，则该整数不存在</li>
+<li>从第一行最后一个数 A 开始查找<ul>
+<li>number &gt;  A                    =&gt;         该整数一定在下一行</li>
+<li>number &lt;= A                   =&gt;         该整数就在这一行</li>
 </ul>
-<h3 id="该库为使用分享，并非建议大家在项目中再次引入"><a href="#该库为使用分享，并非建议大家在项目中再次引入" class="headerlink" title="该库为使用分享，并非建议大家在项目中再次引入."></a>该库为使用分享，并非建议大家在项目中再次引入.</h3><h3 id="使用到的第三方库："><a href="#使用到的第三方库：" class="headerlink" title="使用到的第三方库："></a>使用到的第三方库：</h3><h4 id="HHRouter：https-github-com-Huohua-HHRouter"><a href="#HHRouter：https-github-com-Huohua-HHRouter" class="headerlink" title="HHRouter：https://github.com/Huohua/HHRouter"></a><code>HHRouter</code>：<a href="https://github.com/Huohua/HHRouter" target="_blank" rel="noopener">https://github.com/Huohua/HHRouter</a></h4><h4 id="CocoaPods：pod-‘HHRouter’-‘-gt-0-1-8’："><a href="#CocoaPods：pod-‘HHRouter’-‘-gt-0-1-8’：" class="headerlink" title="CocoaPods：pod ‘HHRouter’, ‘~&gt; 0.1.8’："></a>CocoaPods：pod ‘HHRouter’, ‘~&gt; 0.1.8’：</h4><p>参考链接：</p>
-<p><a href="https://github.com/Huohua/HHRouter#cocoapods" target="_blank" rel="noopener">https://github.com/Huohua/HHRouter#cocoapods</a></p>
-<p><a href="http://www.cocoachina.com/ios/20170301/18811.html" target="_blank" rel="noopener">http://www.cocoachina.com/ios/20170301/18811.html</a></p>
-<p><a href="https://segmentfault.com/a/1190000002585537" target="_blank" rel="noopener">https://segmentfault.com/a/1190000002585537</a></p>
+</li>
+<li>找到整数可能所在的行，往回便利该行<ul>
+<li>number == A                   =&gt;         找到该整数</li>
+<li>number &lt; A                     =&gt;         继续往回遍历</li>
+<li>number &lt; A &amp;&amp; j == 0    =&gt;         该整数不存在</li>
+</ul>
+</li>
+<li>最后一行的最后一个数也小于 number，则该数不存在</li>
+</ol>
+<pre class=" language-objc"><code class="language-objc">/**
+ 在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数
+
+ @param maxtrix 输入二维矩阵
+ @param number 输入整数
+ @return 整数是否存在
+ */
++ (BOOL)isExistInMatrix:(NSArray<nsarray <nsnumber *> *> *)maxtrix number:(NSInteger)number {
+    if ([maxtrix.className isEqualToString:@"NSNull"] || !maxtrix.count || maxtrix == nil) { //鲁棒性
+        return NO;
+    }
+    if ([[maxtrix firstObject] firstObject].integerValue > number || [[maxtrix lastObject] lastObject].integerValue < number) {
+        return NO;
+    }
+    for (int i = 0; i < maxtrix.count; i++) {
+        NSArray <nsnumber *>*array = maxtrix[i];
+        for (NSInteger j = array.count - 1; j >= 0; j--) {
+            if (array[j].integerValue < number) {
+                break;
+            } else if (array[j].integerValue == number) {
+                return YES;
+            } else if (j == 0 && array[j].integerValue > number) {
+                return NO;
+            }
+        }
+    }
+
+    return NO;
+}
+
+</nsnumber></nsarray></code></pre>
+<h3 id="第二题"><a href="#第二题" class="headerlink" title="第二题"></a>第二题</h3><blockquote>
+<p>请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为We Are Happy.则经过替换之后的字符串为We%20Are%20Happy。</p>
+</blockquote>
 
             </div>
             <hr>
@@ -552,7 +445,7 @@ UIViewController *sourceViewController = context[KEY_CMP_SRC_CONTROLLER];
                     </span>
                     <a href="http://yoursite.com" class="b-link-green"></a>
                     <i class="fa fa-angle-right fa-lg fa-fw text-color"></i>
-                    <a href="/2018/03/22/ios-hhrouter/" class="b-link-green">iOS开发 — HHRouter路由数据传递开发分享</a>
+                    <a href="/2018/03/22/jian-zhi-offer-suan-fa-1-5/" class="b-link-green">剑指offer系列一（1 ~ 5）</a>
                 </p>
             </div>
         </div>
@@ -573,9 +466,9 @@ UIViewController *sourceViewController = context[KEY_CMP_SRC_CONTROLLER];
 
 <script type="text/javascript">
     disqus_config = function () {
-        this.page.url = 'http://yoursite.com/2018/03/22/ios-hhrouter/';
-        this.page.identifier = '/2018/03/22/ios-hhrouter/';
-        this.page.title = 'iOS开发 — HHRouter路由数据传递开发分享';
+        this.page.url = 'http://yoursite.com/2018/03/22/jian-zhi-offer-suan-fa-1-5/';
+        this.page.identifier = '/2018/03/22/jian-zhi-offer-suan-fa-1-5/';
+        this.page.title = '剑指offer系列一（1 ~ 5）';
     };
     let disqus_shortname = 'tanzou';
 
@@ -602,26 +495,83 @@ UIViewController *sourceViewController = context[KEY_CMP_SRC_CONTROLLER];
             <div class="article-badge left-badge text-color">
                 <i class="fa fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2018/06/14/loadtimecheck/">
+                <a href="/2018/03/22/ios-hhrouter/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="load 耗时检测">
+                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="iOS开发 — HHRouter路由数据传递开发分享">
                         
-                        <span class="card-title">load 耗时检测</span>
+                        <span class="card-title">iOS开发 — HHRouter路由数据传递开发分享</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            背景目前部分产品反馈启动时间还是较慢。但目前启动时间耗时统计方案无法统计到 main 方法之前的 load 方法耗时，无法定位耗时长的组件代码。
-第三方方案：Hook所有+load方法（包括Category）该方案通过 Hook 所有 Cl
+                            前言在日常开发中，随着业务越来越复杂，代码中的耦合度将会大大增强，各模块间的相互调用将导致相互间的强依赖，我们可以通过使用HHRouter路由设计思路来减少代码的耦合度。
+
+一、传统控制器间的属性传递在日常开发中经常碰到一些属性正向传递的问
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="fa fa-clock-o fa-fw icon-date"></i>2018-06-14
+                            <i class="fa fa-clock-o fa-fw icon-date"></i>2018-03-22
                         </span>
+                        <span class="publish-author">
+                            
+                            <i class="fa fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/源码学习/" class="post-category" target="_blank">
+                                    源码学习
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/HHRouter/" target="_blank">
+                        <span class="chip bg-color">HHRouter</span>
+                    </a>
+                    
+                    <a href="/tags/控制器间传值/" target="_blank">
+                        <span class="chip bg-color">控制器间传值</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6 overflow-policy" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fa fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2017/11/29/ios-interactivetextview/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="iOS开发 — 自定义可交互的 UITextView">
+                        
+                        <span class="card-title">iOS开发 — 自定义可交互的 UITextView</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            #前言
+最近有个项目需要做一个可以对 UITextView 内容进行交互的功能，因此做了一个类似新浪微博，可以展示 Emoji 、@somebody 、#话题# 以及链接的 Demo 。实现点击特殊字段的文字，并得到一个相应的响应。
+
+效果
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="fa fa-clock-o fa-fw icon-date"></i>2017-11-29
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fa fa-bookmark fa-fw icon-category"></i>
@@ -637,74 +587,12 @@ UIViewController *sourceViewController = context[KEY_CMP_SRC_CONTROLLER];
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/load/" target="_blank">
-                        <span class="chip bg-color">load</span>
+                    <a href="/tags/UITextView/" target="_blank">
+                        <span class="chip bg-color">UITextView</span>
                     </a>
                     
-                    <a href="/tags/main函数/" target="_blank">
-                        <span class="chip bg-color">main函数</span>
-                    </a>
-                    
-                    <a href="/tags/method-swizzling/" target="_blank">
-                        <span class="chip bg-color">method swizzling</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6 overflow-policy" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fa fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2018/03/22/jian-zhi-offer-suan-fa-1-5/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="剑指offer系列一（1 ~ 5）">
-                        
-                        <span class="card-title">剑指offer系列一（1 ~ 5）</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            前言用OC刷剑指offer
-算法OC代码地址
-代码基于macOS命令行编写，测试用例已编写在单元测试中，若有遗漏的用例，欢迎留言指正。
-
-第一题
-在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="fa fa-clock-o fa-fw icon-date"></i>2018-03-22
-                            </span>
-                        <span class="publish-author">
-                            
-                            <i class="fa fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/剑指offer系列/" class="post-category" target="_blank">
-                                    剑指offer系列
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/算法/" target="_blank">
-                        <span class="chip bg-color">算法</span>
-                    </a>
-                    
-                    <a href="/tags/Objective-C/" target="_blank">
-                        <span class="chip bg-color">Objective-C</span>
+                    <a href="/tags/图文混排/" target="_blank">
+                        <span class="chip bg-color">图文混排</span>
                     </a>
                     
                 </div>
