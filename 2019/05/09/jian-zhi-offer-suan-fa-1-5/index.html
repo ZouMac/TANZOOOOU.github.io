@@ -336,14 +336,14 @@
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>文章字数:&nbsp;&nbsp;
-                        547
+                        941
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                        2 分
+                        4 分
                     </div>
                     
                 
@@ -420,8 +420,89 @@
 
 </nsnumber></nsarray></code></pre>
 <h3 id="第二题"><a href="#第二题" class="headerlink" title="第二题"></a>第二题</h3><blockquote>
-<p>请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为We Are Happy.则经过替换之后的字符串为We%20Are%20Happy。</p>
+<p>请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为we are coders.则经过替换之后的字符串为we%20are%20coders。</p>
 </blockquote>
+<pre class=" language-objc"><code class="language-objc">解题思路：
+we are coders   =>  we%2dare%2dcoders
+
+|w|e| |a|r|e| |c|o|d|e|r|s|   => length = 13
+
+|w|e| | | |a|r|e| | | |c|o|d|e|r|s|  => 替换后的length = 13 + 2(空格) * 2(比之前多两位) = 17
+
+| | | | | | | | | | | | | | | | | |  => 新的字符串(length = 17)
+
+i => 旧字符串当前位置  j => 新字符串当前位置
+
+|w| | | | | | | | | | | | | | | | |  => 填充第一个旧字符 i++ j++
+|w|e| | | | | | | | | | | | | | | |  => 填充第二个旧字符 i++ j++
+|w|e|%|2|d| | | | | | | | | | | | |  => 遇到空格 填入%2d i++(空格) j += 3(新字符串前进了三位)
+
+    ...
+
+|w|e|%|2|d|a|r|e|%|2|d|c|o|d|e|r|s| => 填充完成
+
+</code></pre>
+<pre class=" language-objc"><code class="language-objc">
+/**
+ 请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为We Are Happy.则经过替换之后的字符串为We%20Are%20Happy。
+
+ @param string 旧字符串
+ @param length 字符串长度
+ @return 替换之后的字符串
+ */
++ (NSString *)replaceSpace:(NSString *)string length:(NSUInteger)length {
+
+    NSUInteger spaceLen = [self getSpaceLength:string length:length];
+//    获取新字符串长度
+    NSUInteger newLen = length + 2 * spaceLen;
+
+//    初始化新字符串
+    NSMutableString *newString = [NSMutableString stringWithCapacity:newLen];
+
+    NSUInteger i = 0;
+    NSUInteger j = 0;
+    while (i < length && j < newLen) { // NSMutableString无法往后插入
+        if ([self isSpace:string index:i]) { // 空格插入 %2d
+            [newString insertString:@"%" atIndex:j++];
+            [newString insertString:@"2" atIndex:j++];
+            [newString insertString:@"d" atIndex:j++];
+            i++;
+        } else { // 非空格插入旧字符
+            [newString insertString:[string substringWithRange:NSMakeRange(i++, 1)] atIndex:j++];
+        }
+    }
+    return [newString copy];
+
+}
+/**
+ 获取空格数
+
+ @param string 旧字符串
+ @param length 字符串长度
+ @return 空格数
+ */
++ (NSUInteger)getSpaceLength:(NSString *)string length:(NSUInteger)length {
+    NSUInteger spaceLen = 0;
+    NSUInteger oldLen = length;
+    while (oldLen > 0) {
+        if ([string characterAtIndex:oldLen - 1] == ' ') {
+            spaceLen++;
+        }
+        oldLen--;
+    }
+    return spaceLen;
+}
+/**
+ 是否是空格
+
+ @param string 旧字符串
+ @param i 当前位置
+ @return isSpace
+ */
++ (BOOL)isSpace:(NSString *)string index:(NSUInteger)i {
+    return [string characterAtIndex:i] == ' ';
+}
+</code></pre>
 
             </div>
             <hr>
@@ -721,7 +802,7 @@ expr -f h --  变量|表达式       //以16进制格式显示变量或表达
 
             
                 &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;
-                <span class="white-color">16.5k</span>
+                <span class="white-color">16.8k</span>
             
 
             
