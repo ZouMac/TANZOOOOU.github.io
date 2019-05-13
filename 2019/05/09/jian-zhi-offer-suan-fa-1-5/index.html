@@ -336,14 +336,14 @@
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>文章字数:&nbsp;&nbsp;
-                        1.1k
+                        1.7k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                        4 分
+                        7 分
                     </div>
                     
                 
@@ -527,6 +527,119 @@ i => 旧字符串当前位置  j => 新字符串当前位置
     }
     return [list copy];
 }
+</code></pre>
+<h3 id="第四题"><a href="#第四题" class="headerlink" title="第四题"></a>第四题</h3><blockquote>
+<p>输入某二叉树的前序遍历和中序遍历的结果，请重建出该二叉树。假设输入的前序遍历和中序遍历的结果中都不含重复的数字。例如输入前序遍历序列{1,2,4,7,3,5,6,8}和中序遍历序列{4,7,2,1,5,3,8,6}，则重建二叉树并返回。</p>
+</blockquote>
+<p>解题思路：</p>
+<p>二叉树：       </p>
+<p>​                 A                                        前序遍历：<strong>A</strong>BDECFG</p>
+<p>​          B            C                    =&gt;        中序遍历：DBE<strong>A</strong>FCG </p>
+<p>​     D       E    F       G                    </p>
+<ul>
+<li>前序遍历的第一个数 =&gt; 根节点A</li>
+<li>中序遍历被根节点A分为左子树的中序遍历（DBE）和右子树的中序遍历（FCG）</li>
+<li>前序遍历根据中序遍历A的位置，将前序遍历分为左子树的前序遍历（BDE）和右子树的前序遍历（CFG）</li>
+<li>递归 <ul>
+<li>左子树：前序遍历BDE、中序遍历DBE</li>
+<li>右子树：前序遍历CFG、中序遍历FCG</li>
+</ul>
+</li>
+</ul>
+<pre class=" language-objc"><code class="language-objc">+ (TreeNode *)reConstructBinaryTree:(NSArray <nsnumber *>*)pre vin:(NSArray <nsnumber *>*)vin {
+
+    if (pre.count == 0 || vin.count == 0) { // 长度为0，为空节点
+        return NULL;
+    }
+
+    TreeNode *root = malloc(sizeof(TreeNode));
+
+    int rootVal = [pre firstObject].intValue;
+    root->value = rootVal;
+
+//    获取middle节点
+    int leftVinIndex = 0;
+    for (int i = 0; i < vin.count; i++) {
+        leftVinIndex++;
+        if (vin[i].intValue == rootVal) {
+            break;
+        }
+    }
+
+    NSArray <nsnumber *> *subPreLeft = [pre subarrayWithRange:NSMakeRange(1, leftVinIndex - 1)];
+    NSArray <nsnumber *> *subVinLeft = [vin subarrayWithRange:NSMakeRange(0, leftVinIndex - 1)];
+
+
+    NSArray <nsnumber *> *subPreRight = [pre subarrayWithRange:NSMakeRange(leftVinIndex, pre.count - leftVinIndex)];
+
+    NSArray <nsnumber *> *subVinRight = [vin subarrayWithRange:NSMakeRange(leftVinIndex, vin.count - leftVinIndex)];
+
+//    递归左右子树
+    root->left = [self reConstructBinaryTree:subPreLeft vin:subVinLeft];
+    root->right = [self reConstructBinaryTree:subPreRight vin:subVinRight];
+
+    return root;
+}
+</nsnumber></nsnumber></nsnumber></nsnumber></nsnumber></nsnumber></code></pre>
+<h3 id="第五题"><a href="#第五题" class="headerlink" title="第五题"></a>第五题</h3><blockquote>
+<p>用两个栈来实现一个队列，完成队列的Push和Pop操作。 队列中的元素为NSNumber类型。</p>
+</blockquote>
+<p>解题思路：</p>
+<p>栈：先进后出(First In Last Out, FILO)</p>
+<p>队列：先进先出(First In First Out, FIFO)</p>
+<p>因此可以利用两个栈实现队列：</p>
+<ul>
+<li>pushStack 保存push进来的元素 [1, 2, 3, 4, 5]</li>
+<li>再逆序将pushStack元素保存到popStack中[5, 4, 3, 2, 1]，这样popStack的栈顶就是1了</li>
+<li>pop出popStack的栈顶</li>
+</ul>
+<pre class=" language-objc"><code class="language-objc">@interface NumberFive()
+
+/**
+ 保存入队的元素
+ */
+@property (nonatomic, strong) TZStack *pushStack;
+
+
+/**
+ 保存出队的元素
+ */
+@property (nonatomic, strong) TZStack *popStack2;
+
+@end
+
+@implementation NumberFive
+
+- (NSNumber *)pop {
+//    用于pop的栈为空时，倒序插入pushStack
+    if (self.popStack2.empty) {
+        while (!self.pushStack.empty) {
+            [self.popStack2 push:[self.pushStack pop]];
+        }
+    }
+//    出队列
+    return [self.popStack2 pop];
+}
+
+- (void)push:(NSNumber *)node {
+    [self.pushStack push:node];
+}
+
+- (TZStack *)pushStack {
+    if (!_pushStack) {
+        _pushStack = [[TZStack alloc] init];
+    }
+    return _pushStack;
+}
+
+- (TZStack *)popStack2 {
+    if (!_popStack2) {
+        _popStack2 = [[TZStack alloc] init];
+    }
+    return _popStack2;
+}
+
+@end
 </code></pre>
 
             </div>
@@ -827,7 +940,7 @@ expr -f h --  变量|表达式       //以16进制格式显示变量或表达
 
             
                 &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;
-                <span class="white-color">17k</span>
+                <span class="white-color">17.6k</span>
             
 
             
