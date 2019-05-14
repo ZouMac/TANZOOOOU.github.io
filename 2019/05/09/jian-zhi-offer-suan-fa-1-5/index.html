@@ -336,14 +336,14 @@
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>文章字数:&nbsp;&nbsp;
-                        1.7k
+                        1.5k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                        7 分
+                        6 分
                     </div>
                     
                 
@@ -366,12 +366,7 @@
 <h3 id="第一题"><a href="#第一题" class="headerlink" title="第一题"></a>第一题</h3><blockquote>
 <p>在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。</p>
 </blockquote>
-<pre class=" language-objc"><code class="language-objc">解题思路：
- 1   2   3   4       9
- 5   6   7   8      ===>     outPut  ===> true
- 9  10  11  12
-13  14  15  16 
-</code></pre>
+<p><img src="/2019/05/09/jian-zhi-offer-suan-fa-1-5/numberOne.png" alt="第一题"></p>
 <ol>
 <li>二维数组为空时，直接返回 NO</li>
 <li>第一个数大于 number 或最后一个数小于 number，则该整数不存在</li>
@@ -422,26 +417,7 @@
 <h3 id="第二题"><a href="#第二题" class="headerlink" title="第二题"></a>第二题</h3><blockquote>
 <p>请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为we are coders.则经过替换之后的字符串为we%20are%20coders。</p>
 </blockquote>
-<pre class=" language-objc"><code class="language-objc">解题思路：
-we are coders   =>  we%2dare%2dcoders
-
-|w|e| |a|r|e| |c|o|d|e|r|s|   => length = 13
-
-|w|e| | | |a|r|e| | | |c|o|d|e|r|s|  => 替换后的length = 13 + 2(空格) * 2(比之前多两位) = 17
-
-| | | | | | | | | | | | | | | | | |  => 新的字符串(length = 17)
-
-i => 旧字符串当前位置  j => 新字符串当前位置
-
-|w| | | | | | | | | | | | | | | | |  => 填充第一个旧字符 i++ j++
-|w|e| | | | | | | | | | | | | | | |  => 填充第二个旧字符 i++ j++
-|w|e|%|2|d| | | | | | | | | | | | |  => 遇到空格 填入%2d i++(空格) j += 3(新字符串前进了三位)
-
-    ...
-
-|w|e|%|2|d|a|r|e|%|2|d|c|o|d|e|r|s| => 填充完成
-
-</code></pre>
+<p><img src="/2019/05/09/jian-zhi-offer-suan-fa-1-5/numberTwo.png" alt="第二题"></p>
 <pre class=" language-objc"><code class="language-objc">
 /**
  请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为We Are Happy.则经过替换之后的字符串为We%20Are%20Happy。
@@ -532,10 +508,7 @@ i => 旧字符串当前位置  j => 新字符串当前位置
 <p>输入某二叉树的前序遍历和中序遍历的结果，请重建出该二叉树。假设输入的前序遍历和中序遍历的结果中都不含重复的数字。例如输入前序遍历序列{1,2,4,7,3,5,6,8}和中序遍历序列{4,7,2,1,5,3,8,6}，则重建二叉树并返回。</p>
 </blockquote>
 <p>解题思路：</p>
-<p>二叉树：       </p>
-<p>​                 A                                        前序遍历：<strong>A</strong>BDECFG</p>
-<p>​          B            C                    =&gt;        中序遍历：DBE<strong>A</strong>FCG </p>
-<p>​     D       E    F       G                    </p>
+<p><img src="/2019/05/09/jian-zhi-offer-suan-fa-1-5/numberFour.png" alt="第四题"></p>
 <ul>
 <li>前序遍历的第一个数 =&gt; 根节点A</li>
 <li>中序遍历被根节点A分为左子树的中序遍历（DBE）和右子树的中序遍历（FCG）</li>
@@ -940,7 +913,7 @@ expr -f h --  变量|表达式       //以16进制格式显示变量或表达
 
             
                 &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;
-                <span class="white-color">17.6k</span>
+                <span class="white-color">17.4k</span>
             
 
             
