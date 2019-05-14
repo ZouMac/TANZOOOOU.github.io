@@ -6,8 +6,11 @@
     <meta charset="utf-8">
     <meta name="keywords" content="踩坑笔记, null">
     <meta name="description" content="记录开发中碰到的一些问题，以防日后继续踩坑
-2019.04po的完整版expr   变量|表达式              //显示变量或者表达式的值。
-expr -f h --  变量|表达式       //以16进制格式显示变量或表达">
+2019.05KVO中的注意点
+观察者强引用对象，但对象（底层实现）没有强引用观察者。不会造成循环引用。
+观察者有可能会被释放。但对象可能还是会给观察者发消息，造成奔溃。
+
+因此在观察者deall">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -337,14 +340,14 @@ expr -f h --  变量|表达式       //以16进制格式显示变量或表达">
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>文章字数:&nbsp;&nbsp;
-                        2.2k
+                        2.3k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                        8 分
+                        9 分
                     </div>
                     
                 
@@ -361,6 +364,11 @@ expr -f h --  变量|表达式       //以16进制格式显示变量或表达">
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <p><strong>记录开发中碰到的一些问题，以防日后继续踩坑</strong></p>
+<h2 id="2019-05"><a href="#2019-05" class="headerlink" title="2019.05"></a>2019.05</h2><h3 id="KVO中的注意点"><a href="#KVO中的注意点" class="headerlink" title="KVO中的注意点"></a>KVO中的注意点</h3><ul>
+<li>观察者强引用对象，但对象（底层实现）没有强引用观察者。不会造成循环引用。</li>
+<li>观察者有可能会被释放。但对象可能还是会给观察者发消息，造成奔溃。</li>
+</ul>
+<p>因此在观察者dealloc方法中需要注销kvo。</p>
 <h2 id="2019-04"><a href="#2019-04" class="headerlink" title="2019.04"></a>2019.04</h2><h3 id="po的完整版"><a href="#po的完整版" class="headerlink" title="po的完整版"></a>po的完整版</h3><pre class=" language-objc"><code class="language-objc">expr   变量|表达式              //显示变量或者表达式的值。
 expr -f h --  变量|表达式       //以16进制格式显示变量或表达式的内容
 expr -f b --  变量|表达式       //以二进制格式显示变量或者表达式的内容。
@@ -915,7 +923,7 @@ typedef NS_ENUM(NSInteger, NSWritingDirection) {
 
             
                 &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;
-                <span class="white-color">17.4k</span>
+                <span class="white-color">17.5k</span>
             
 
             

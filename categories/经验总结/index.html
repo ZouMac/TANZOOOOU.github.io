@@ -280,8 +280,11 @@ $('.bg-cover').css('background-image', 'url(/medias/banner/' + new Date().getDay
                         <div class="summary block-with-text">
                             
                                 记录开发中碰到的一些问题，以防日后继续踩坑
-2019.04po的完整版expr   变量|表达式              //显示变量或者表达式的值。
-expr -f h --  变量|表达式       //以16进制格式显示变量或表达
+2019.05KVO中的注意点
+观察者强引用对象，但对象（底层实现）没有强引用观察者。不会造成循环引用。
+观察者有可能会被释放。但对象可能还是会给观察者发消息，造成奔溃。
+
+因此在观察者deall
                             
                         </div>
                         <div class="publish-info">
@@ -493,7 +496,7 @@ expr -f h --  变量|表达式       //以16进制格式显示变量或表达
 
             
                 &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;
-                <span class="white-color">17.4k</span>
+                <span class="white-color">17.5k</span>
             
 
             
