@@ -6,11 +6,9 @@
     <meta charset="utf-8">
     <meta name="keywords" content="踩坑笔记, null">
     <meta name="description" content="记录开发中碰到的一些问题，以防日后继续踩坑
-2019.05KVO中的注意点
-观察者强引用对象，但对象（底层实现）没有强引用观察者。不会造成循环引用。
-观察者有可能会被释放。但对象可能还是会给观察者发消息，造成奔溃。
-
-因此在观察者deall">
+2019.06ARC 自动插入引用计数引用计数
+ARC插入retain、release、autoRelease是在编译时进行自动插入的。
+setter方法中，会先对传入的对象进行retain（+1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -340,14 +338,14 @@
                     
                     <div class="info-break-policy">
                         <i class="fa fa-file-word-o fa-fw"></i>文章字数:&nbsp;&nbsp;
-                        2.3k
+                        2.6k
                     </div>
                     
 
                     
                     <div class="info-break-policy">
                         <i class="fa fa-clock-o fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                        9 分
+                        10 分
                     </div>
                     
                 
@@ -364,6 +362,48 @@
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <p><strong>记录开发中碰到的一些问题，以防日后继续踩坑</strong></p>
+<h2 id="2019-06"><a href="#2019-06" class="headerlink" title="2019.06"></a>2019.06</h2><h3 id="ARC-自动插入引用计数引用计数"><a href="#ARC-自动插入引用计数引用计数" class="headerlink" title="ARC 自动插入引用计数引用计数"></a>ARC 自动插入引用计数引用计数</h3><ul>
+<li>ARC插入retain、release、autoRelease是在编译时进行自动插入的。</li>
+<li>setter方法中，会先对传入的对象进行retain（+1），再对之前的对象进行release（-1），这个顺序很重要，防止传入的对象与之前是同一个对象，导致对象引用计数先减为0，直接释放掉，无法再获取到。</li>
+<li>autoRelease是在下一次runloop时，才去release。</li>
+<li>自动插入时，编译器有进行优化，首先会删除成对的retain、release。</li>
+<li>当存在函数返回值时，会给返回值添加autoRelease，以保证能够在拿到该返回值后，返回值才被释放。</li>
+</ul>
+<pre class=" language-objc"><code class="language-objc">// MRC 版本
+- (void)sleep {
+    NSString *name = [self getName];
+    _name = [name retain];
+}
+
+- (NSString *)getName {
+    NSString *name = @"1111";
+    return [name autoRelease];
+}
+</code></pre>
+<ul>
+<li>这边的autoRelease和retain看起来可以约去，但是为了考虑向后兼容性（MRC），这边不能直接删去。因此ARC在运行时，会对这部分代码进行优化，使用 <code>objc_autoreleaseReturnValue</code> 和 <code>objc_retainAutoreleasedReturnValue</code>这两个方法（具体见下边代码）。</li>
+</ul>
+<pre class=" language-objc"><code class="language-objc">// ARC 版本
+- (void)sleep {
+    _name = [self getName];
+}
+
+- (NSString *)getName {
+    NSString *name = @"1111";
+    return name;
+}
+</code></pre>
+<pre class=" language-objc"><code class="language-objc">// 运行时
+- (void)sleep {
+    NSString *name = [self getName];
+    _name = objc_retainAutoreleasedReturnValue(name); // flag(status) == true => 不进行retain => flag(0)
+}
+
+- (NSString *)getName {
+    NSString *name = @"1111";
+    objc_autoreleaseReturnValue(name); // 通过编译器获取之后是否调用retain => flag(status)
+}
+</code></pre>
 <h2 id="2019-05"><a href="#2019-05" class="headerlink" title="2019.05"></a>2019.05</h2><h3 id="KVO中的注意点"><a href="#KVO中的注意点" class="headerlink" title="KVO中的注意点"></a>KVO中的注意点</h3><ul>
 <li>观察者强引用对象，但对象（底层实现）没有强引用观察者。不会造成循环引用。</li>
 <li>观察者有可能会被释放。但对象可能还是会给观察者发消息，造成奔溃。</li>
@@ -923,7 +963,7 @@ typedef NS_ENUM(NSInteger, NSWritingDirection) {
 
             
                 &nbsp;<i class="fa fa-area-chart"></i>&nbsp;站点总字数:&nbsp;
-                <span class="white-color">17.5k</span>
+                <span class="white-color">17.8k</span>
             
 
             
